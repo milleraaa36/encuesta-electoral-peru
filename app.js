@@ -1,198 +1,192 @@
 // ══════════════════════════════════════════════
 //  app.js · VotaPerú 2026
-//  Paso 1: datos de ejemplo + lógica visual
-//  (sin base de datos aún — todo en memoria)
+//  Paso 3: Supabase real — auth + votos + datos
 // ══════════════════════════════════════════════
 
-// ── DATOS DE EJEMPLO ──
-// En el paso siguiente estos datos vendrán de Supabase.
-// Por ahora están aquí para que veas cómo funciona todo.
-
-const PARTIDOS = [
-  {
-    id: "fp",
-    nombre: "Fuerza Popular",
-    sigla: "FP",
-    color: "#F4A01C",
-    propuestas: [
-      "Reducción del IGV al 16%",
-      "Mano dura contra la corrupción",
-      "Reactivación económica con inversión privada",
-      "Defensa de la Constitución del 93"
-    ]
-  },
-  {
-    id: "pp",
-    nombre: "Perú Libre",
-    sigla: "PL",
-    color: "#C8102E",
-    propuestas: [
-      "Nueva Constitución vía referéndum",
-      "Estatización de recursos naturales",
-      "Educación y salud 100% gratuitas",
-      "Reforma agraria modernizada"
-    ]
-  },
-  {
-    id: "ap",
-    nombre: "Acción Popular",
-    sigla: "AP",
-    color: "#1A6B3C",
-    propuestas: [
-      "Descentralización real del Estado",
-      "Fortalecimiento de gobiernos regionales",
-      "Agua potable para zonas rurales",
-      "Lucha contra la informalidad"
-    ]
-  },
-  {
-    id: "av",
-    nombre: "Avancemos",
-    sigla: "AV",
-    color: "#2563EB",
-    propuestas: [
-      "Modernización del Estado digital",
-      "Inversión en ciencia y tecnología",
-      "Reforma educativa con enfoque STEM",
-      "Acuerdos de libre comercio ampliados"
-    ]
-  }
-];
-
-const CANDIDATOS = [
-  {
-    id: 1,
-    nombre: "María López Rivas",
-    partido: "fp",
-    edad: 58,
-    nacimiento: "Arequipa",
-    denuncias: 2,
-    cargos: ["Congresista 2016–2021", "Alcaldesa Arequipa 2010–2014"],
-    experiencia: "14 años en política",
-    votos: 0
-  },
-  {
-    id: 2,
-    nombre: "Carlos Mendoza Quispe",
-    partido: "pp",
-    edad: 63,
-    nacimiento: "Puno",
-    denuncias: 5,
-    cargos: ["Gobernador Regional Puno", "Docente universitario"],
-    experiencia: "8 años en política",
-    votos: 0
-  },
-  {
-    id: 3,
-    nombre: "Ana Villanueva Torres",
-    partido: "ap",
-    edad: 51,
-    nacimiento: "Cusco",
-    denuncias: 0,
-    cargos: ["Ministra de Educación 2019–2021", "Congresista 2021–2026"],
-    experiencia: "10 años en política",
-    votos: 0
-  },
-  {
-    id: 4,
-    nombre: "Roberto Sánchez Díaz",
-    partido: "av",
-    edad: 47,
-    nacimiento: "Lima",
-    denuncias: 1,
-    cargos: ["Alcalde San Isidro 2018–2022", "Economista del MEF"],
-    experiencia: "6 años en política",
-    votos: 0
-  }
-];
+import {
+  obtenerPartidos,
+  obtenerCandidatos,
+  registrarVoto,
+  yaVotoElUsuario,
+  login,
+  registro,
+  cerrarSesion,
+  escucharSesion
+} from './supabase.js'
 
 // ── ESTADO GLOBAL ──
-let usuarioActual = null;   // null = no logueado
-let yaVoto = false;         // si ya votó en esta sesión
-let votosSimulados = {      // votos de ejemplo para demostración
-  1: 1240,
-  2: 870,
-  3: 1550,
-  4: 640
-};
+let PARTIDOS   = []
+let CANDIDATOS = []
+let usuarioActual = null
+let yaVoto = false
+
+// ══════════════════════════════════════════════
+//  ARRANQUE
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Escuchar cambios de sesión (login / logout automático)
+  escucharSesion(async (usuario) => {
+    usuarioActual = usuario
+    actualizarHeaderUsuario()
+
+    if (usuario) {
+      yaVoto = await yaVotoElUsuario()
+      document.getElementById('aviso-login').style.display = 'none'
+    } else {
+      yaVoto = false
+      document.getElementById('aviso-login').style.display = 'block'
+    }
+
+    renderEncuesta()
+  })
+
+  // 2. Cargar datos desde Supabase
+  mostrarCargando(true)
+  await cargarDatos()
+  mostrarCargando(false)
+
+  // 3. Render inicial
+  renderEncuesta()
+})
+
+// ══════════════════════════════════════════════
+//  CARGA DE DATOS
+// ══════════════════════════════════════════════
+async function cargarDatos() {
+  const [partidos, candidatos] = await Promise.all([
+    obtenerPartidos(),
+    obtenerCandidatos()
+  ])
+  PARTIDOS   = partidos
+  CANDIDATOS = candidatos
+}
+
+function mostrarCargando(estado) {
+  const el = document.getElementById('lista-candidatos')
+  if (!el) return
+  if (estado) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:2rem;color:var(--gris);font-size:0.9rem">
+        Cargando datos...
+      </div>`
+  }
+}
 
 // ══════════════════════════════════════════════
 //  NAVEGACIÓN
 // ══════════════════════════════════════════════
-function mostrarSeccion(id, btn) {
-  // Ocultar todas
-  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
-  // Mostrar la pedida
-  document.getElementById(id).classList.add('activa');
-  // Actualizar botones nav
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'));
-  if (btn) btn.classList.add('activo');
+window.mostrarSeccion = function(id, btn) {
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'))
+  document.getElementById(id).classList.add('activa')
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'))
+  if (btn) btn.classList.add('activo')
 
-  // Renderizar contenido según sección
-  if (id === 'inicio')      renderEncuesta();
-  if (id === 'partidos')    renderPartidos();
-  if (id === 'candidatos')  { poblarFiltros(); renderCandidatos(); }
-  if (id === 'comparador')  { poblarFiltrosComp(); renderComparador(); }
+  if (id === 'inicio')     renderEncuesta()
+  if (id === 'partidos')   renderPartidos()
+  if (id === 'candidatos') { poblarFiltros(); renderCandidatos() }
+  if (id === 'comparador') { poblarFiltrosComp(); renderComparador() }
 }
 
 // ══════════════════════════════════════════════
-//  RENDER: ENCUESTA (inicio)
+//  HEADER — usuario logueado
+// ══════════════════════════════════════════════
+function actualizarHeaderUsuario() {
+  const btn = document.querySelector('.btn-login')
+  if (!btn) return
+
+  if (usuarioActual) {
+    const nombre = usuarioActual.email.split('@')[0]
+    btn.textContent = `${nombre} · Salir`
+    btn.onclick = async () => {
+      await cerrarSesion()
+    }
+  } else {
+    btn.textContent = 'Iniciar sesión'
+    btn.onclick = abrirModal
+  }
+}
+
+// ══════════════════════════════════════════════
+//  RENDER: ENCUESTA
 // ══════════════════════════════════════════════
 function renderEncuesta() {
-  const totalVotos = Object.values(votosSimulados).reduce((a, b) => a + b, 0);
-  const contenedor = document.getElementById('lista-candidatos');
-  if (!contenedor) return;
+  const totalVotos = CANDIDATOS.reduce((acc, c) => acc + (c.votos || 0), 0)
+  const contenedor = document.getElementById('lista-candidatos')
+  if (!contenedor || CANDIDATOS.length === 0) return
 
   contenedor.innerHTML = CANDIDATOS.map(c => {
-    const partido = PARTIDOS.find(p => p.id === c.partido);
-    const votos = votosSimulados[c.id] || 0;
-    const pct = totalVotos > 0 ? Math.round((votos / totalVotos) * 100) : 0;
+    const partido = PARTIDOS.find(p => p.id === c.partido_id) || {}
+    const pct = totalVotos > 0 ? Math.round(((c.votos || 0) / totalVotos) * 100) : 0
 
     return `
-      <div class="candidato-opcion ${yaVoto ? '' : 'clickeable'}"
+      <div class="candidato-opcion"
            onclick="votar(${c.id})"
-           style="cursor:${yaVoto ? 'default' : 'pointer'}">
-        <div class="partido-color" style="background:${partido.color}"></div>
+           style="cursor:${yaVoto || !usuarioActual ? 'default' : 'pointer'}">
+        <div class="partido-color" style="background:${partido.color || '#999'}"></div>
         <div style="flex:1;min-width:0">
           <div class="candidato-nombre">${c.nombre}</div>
-          <div class="candidato-partido">${partido.nombre}</div>
+          <div class="candidato-partido">${partido.nombre || ''}</div>
         </div>
         <div class="barra-wrap" style="max-width:120px">
           <div class="barra-fill" style="width:${pct}%"></div>
         </div>
         <div class="porcentaje">${pct}%</div>
-      </div>`;
-  }).join('');
+      </div>`
+  }).join('')
 
   document.getElementById('total-votos').textContent =
-    `${totalVotos.toLocaleString()} votos registrados`;
+    `${totalVotos.toLocaleString()} votos registrados`
 }
 
-function votar(candidatoId) {
+window.votar = async function(candidatoId) {
   if (!usuarioActual) {
-    abrirModal();
-    return;
+    abrirModal()
+    return
   }
   if (yaVoto) {
-    alert('Ya registraste tu voto. Solo se permite un voto por cuenta.');
-    return;
+    mostrarToast('Ya registraste tu voto. Solo se permite uno por cuenta.')
+    return
   }
-  votosSimulados[candidatoId] = (votosSimulados[candidatoId] || 0) + 1;
-  yaVoto = true;
-  renderEncuesta();
 
-  // Resaltar el candidato votado
-  const opciones = document.querySelectorAll('.candidato-opcion');
-  const idx = CANDIDATOS.findIndex(c => c.id === candidatoId);
-  if (opciones[idx]) opciones[idx].classList.add('votado');
+  // Bloquear clicks mientras se procesa
+  document.querySelectorAll('.candidato-opcion').forEach(el => {
+    el.style.pointerEvents = 'none'
+  })
+
+  const resultado = await registrarVoto(candidatoId)
+
+  if (resultado.ok) {
+    yaVoto = true
+    const cand = CANDIDATOS.find(c => c.id === candidatoId)
+    if (cand) cand.votos = (cand.votos || 0) + 1
+    mostrarToast('✓ Voto registrado correctamente.')
+    renderEncuesta()
+    setTimeout(() => {
+      const idx = CANDIDATOS.findIndex(c => c.id === candidatoId)
+      const opciones = document.querySelectorAll('.candidato-opcion')
+      if (opciones[idx]) opciones[idx].classList.add('votado')
+    }, 50)
+  } else {
+    mostrarToast(resultado.mensaje, true)
+    document.querySelectorAll('.candidato-opcion').forEach(el => {
+      el.style.pointerEvents = 'auto'
+    })
+  }
 }
 
 // ══════════════════════════════════════════════
 //  RENDER: PARTIDOS
 // ══════════════════════════════════════════════
 function renderPartidos() {
-  const contenedor = document.getElementById('lista-partidos');
-  if (!contenedor) return;
+  const contenedor = document.getElementById('lista-partidos')
+  if (!contenedor) return
+
+  if (PARTIDOS.length === 0) {
+    contenedor.innerHTML = `<p style="color:var(--gris);font-size:0.9rem">
+      Aún no hay partidos cargados. Agrégalos desde el panel de admin.</p>`
+    return
+  }
 
   contenedor.innerHTML = PARTIDOS.map(p => `
     <div class="tarjeta">
@@ -204,50 +198,51 @@ function renderPartidos() {
         </div>
       </div>
       <ul class="propuestas-lista">
-        ${p.propuestas.map(prop => `<li>${prop}</li>`).join('')}
+        ${(p.propuestas || []).map(prop => `<li>${prop}</li>`).join('')}
       </ul>
     </div>`
-  ).join('');
+  ).join('')
 }
 
 // ══════════════════════════════════════════════
 //  RENDER: CANDIDATOS
 // ══════════════════════════════════════════════
 function poblarFiltros() {
-  const sel = document.getElementById('filtro-partido-cand');
-  if (!sel || sel.options.length > 1) return;
+  const sel = document.getElementById('filtro-partido-cand')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Todos los partidos</option>'
   PARTIDOS.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.id;
-    opt.textContent = p.nombre;
-    sel.appendChild(opt);
-  });
+    const opt = document.createElement('option')
+    opt.value = p.id
+    opt.textContent = p.nombre
+    sel.appendChild(opt)
+  })
 }
 
-function renderCandidatos() {
-  const filtroPartido = document.getElementById('filtro-partido-cand')?.value || '';
-  const busqueda = (document.getElementById('buscar-candidato')?.value || '').toLowerCase();
-  const contenedor = document.getElementById('lista-candidatos-full');
-  if (!contenedor) return;
+window.renderCandidatos = function() {
+  const filtroPartido = document.getElementById('filtro-partido-cand')?.value || ''
+  const busqueda = (document.getElementById('buscar-candidato')?.value || '').toLowerCase()
+  const contenedor = document.getElementById('lista-candidatos-full')
+  if (!contenedor) return
 
-  let lista = CANDIDATOS;
-  if (filtroPartido) lista = lista.filter(c => c.partido === filtroPartido);
-  if (busqueda) lista = lista.filter(c => c.nombre.toLowerCase().includes(busqueda));
+  let lista = CANDIDATOS
+  if (filtroPartido) lista = lista.filter(c => c.partido_id === filtroPartido)
+  if (busqueda) lista = lista.filter(c => c.nombre.toLowerCase().includes(busqueda))
 
   if (lista.length === 0) {
-    contenedor.innerHTML = '<p style="color:var(--gris);font-size:0.9rem">No se encontraron candidatos.</p>';
-    return;
+    contenedor.innerHTML = '<p style="color:var(--gris);font-size:0.9rem">No se encontraron candidatos.</p>'
+    return
   }
 
   contenedor.innerHTML = lista.map(c => {
-    const partido = PARTIDOS.find(p => p.id === c.partido);
-    const iniciales = c.nombre.split(' ').slice(0, 2).map(n => n[0]).join('');
+    const partido = PARTIDOS.find(p => p.id === c.partido_id) || {}
+    const iniciales = c.nombre.split(' ').slice(0, 2).map(n => n[0]).join('')
 
     return `
       <div class="candidato-card">
-        <div class="candidato-avatar" style="background:${partido.color}">${iniciales}</div>
+        <div class="candidato-avatar" style="background:${partido.color || '#999'}">${iniciales}</div>
         <h3>${c.nombre}</h3>
-        <span class="partido-tag" style="background:${partido.color}">${partido.nombre}</span>
+        <span class="partido-tag" style="background:${partido.color || '#999'}">${partido.nombre || ''}</span>
         <div class="dato-grid">
           <div class="dato-item">
             <div class="dato-label">Edad</div>
@@ -263,178 +258,218 @@ function renderCandidatos() {
           </div>
           <div class="dato-item">
             <div class="dato-label">Experiencia</div>
-            <div class="dato-valor" style="font-size:0.8rem">${c.experiencia}</div>
+            <div class="dato-valor" style="font-size:0.8rem">${c.experiencia || '—'}</div>
           </div>
         </div>
         <div style="margin-top:8px">
           <div class="dato-label" style="margin-bottom:4px">Cargos previos</div>
-          <ul style="font-size:0.8rem;color:var(--gris);line-height:1.8;padding-left:0;list-style:none">
-            ${c.cargos.map(cargo => `<li>→ ${cargo}</li>`).join('')}
+          <ul style="font-size:0.8rem;color:var(--gris);line-height:1.8;list-style:none;padding:0">
+            ${(c.cargos || []).map(cargo => `<li>→ ${cargo}</li>`).join('')}
           </ul>
         </div>
-      </div>`;
-  }).join('');
+      </div>`
+  }).join('')
 }
 
 // ══════════════════════════════════════════════
 //  RENDER: COMPARADOR
 // ══════════════════════════════════════════════
 function poblarFiltrosComp() {
-  const sel = document.getElementById('filtro-partido-comp');
-  if (!sel || sel.options.length > 1) return;
+  const sel = document.getElementById('filtro-partido-comp')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Todos los partidos</option>'
   PARTIDOS.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.id;
-    opt.textContent = p.nombre;
-    sel.appendChild(opt);
-  });
+    const opt = document.createElement('option')
+    opt.value = p.id
+    opt.textContent = p.nombre
+    sel.appendChild(opt)
+  })
 }
 
-function renderComparador() {
-  const filtroPartido = document.getElementById('filtro-partido-comp')?.value || '';
-  const filtroCol = document.getElementById('filtro-columna')?.value || 'todo';
-  const tbody = document.getElementById('tbody-comp');
-  if (!tbody) return;
+window.renderComparador = function() {
+  const filtroPartido = document.getElementById('filtro-partido-comp')?.value || ''
+  const filtroCol = document.getElementById('filtro-columna')?.value || 'todo'
+  const tbody = document.getElementById('tbody-comp')
+  if (!tbody) return
 
-  let lista = CANDIDATOS;
-  if (filtroPartido) lista = lista.filter(c => c.partido === filtroPartido);
+  let lista = CANDIDATOS
+  if (filtroPartido) lista = lista.filter(c => c.partido_id === filtroPartido)
 
   tbody.innerHTML = lista.map(c => {
-    const partido = PARTIDOS.find(p => p.id === c.partido);
+    const partido = PARTIDOS.find(p => p.id === c.partido_id) || {}
+    const mostrar = (col) => filtroCol === 'todo' || filtroCol === col
+
     return `
       <tr>
         <td><strong>${c.nombre}</strong></td>
-        <td><span style="background:${partido.color};color:white;padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600">${partido.sigla}</span></td>
-        <td>${filtroCol === 'denuncias' || filtroCol === 'experiencia' ? '—' : c.edad}</td>
-        <td>${filtroCol !== 'todo' ? '—' : c.nacimiento}</td>
-        <td>${filtroCol === 'edad' || filtroCol === 'experiencia' ? '—' :
-          `<span class="tag-denuncias">${c.denuncias} denuncia${c.denuncias !== 1 ? 's' : ''}</span>`}</td>
-        <td>${filtroCol === 'edad' || filtroCol === 'denuncias' ? '—' :
-          c.cargos.slice(0, 2).join(', ')}</td>
-        <td>${filtroCol === 'edad' || filtroCol === 'denuncias' ? '—' : c.experiencia}</td>
-      </tr>`;
-  }).join('');
+        <td>
+          <span style="background:${partido.color||'#999'};color:white;
+            padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:600">
+            ${partido.sigla || ''}
+          </span>
+        </td>
+        <td>${mostrar('edad') ? c.edad : '—'}</td>
+        <td>${filtroCol === 'todo' ? c.nacimiento : '—'}</td>
+        <td>${mostrar('denuncias') || filtroCol === 'todo'
+          ? `<span class="tag-denuncias">${c.denuncias} denuncia${c.denuncias !== 1 ? 's' : ''}</span>`
+          : '—'}</td>
+        <td>${mostrar('experiencia') ? (c.cargos || []).slice(0, 2).join(', ') : '—'}</td>
+        <td>${mostrar('experiencia') ? (c.experiencia || '—') : '—'}</td>
+      </tr>`
+  }).join('')
 }
 
 // ══════════════════════════════════════════════
-//  MODAL LOGIN
+//  MODAL LOGIN / REGISTRO
 // ══════════════════════════════════════════════
 function abrirModal() {
-  document.getElementById('modal-overlay').classList.add('abierto');
+  document.getElementById('modal-overlay').classList.add('abierto')
+}
+window.abrirModal = abrirModal
+
+window.cerrarModal = function() {
+  document.getElementById('modal-overlay').classList.remove('abierto')
+  document.getElementById('modal-error').style.display = 'none'
 }
 
-function cerrarModal() {
-  document.getElementById('modal-overlay').classList.remove('abierto');
+window.cerrarModalSiFuera = function(e) {
+  if (e.target === document.getElementById('modal-overlay')) window.cerrarModal()
 }
 
-function cerrarModalSiFuera(e) {
-  if (e.target === document.getElementById('modal-overlay')) cerrarModal();
+window.cambiarTab = function(tab, btn) {
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('activo'))
+  btn.classList.add('activo')
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none'
+  document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none'
+  document.getElementById('modal-error').style.display = 'none'
 }
 
-function cambiarTab(tab, btn) {
-  document.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('activo'));
-  btn.classList.add('activo');
-  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
-  document.getElementById('modal-error').style.display = 'none';
-}
-
-// Login simulado (en el siguiente paso se conecta a Supabase)
-function iniciarSesion() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const err = document.getElementById('modal-error');
+window.iniciarSesion = async function() {
+  const email = document.getElementById('login-email').value.trim()
+  const pass  = document.getElementById('login-pass').value
+  const err   = document.getElementById('modal-error')
 
   if (!email || !pass) {
-    err.textContent = 'Completa todos los campos.';
-    err.style.display = 'block';
-    return;
+    err.textContent = 'Completa todos los campos.'
+    err.style.display = 'block'
+    return
   }
 
-  // Simulación: cualquier correo/pass funciona por ahora
-  usuarioActual = { email };
-  cerrarModal();
-  document.querySelector('.btn-login').textContent = email.split('@')[0];
-  document.getElementById('aviso-login').style.display = 'none';
-  renderEncuesta();
+  const btn = document.querySelector('#form-login .btn-enviar')
+  btn.textContent = 'Ingresando...'
+  btn.disabled = true
+
+  const resultado = await login(email, pass)
+
+  btn.textContent = 'Ingresar'
+  btn.disabled = false
+
+  if (resultado.ok) {
+    window.cerrarModal()
+    mostrarToast('✓ Sesión iniciada correctamente.')
+  } else {
+    err.textContent = resultado.mensaje
+    err.style.display = 'block'
+  }
 }
 
-function registrarse() {
-  const email = document.getElementById('reg-email').value.trim();
-  const pass = document.getElementById('reg-pass').value;
-  const err = document.getElementById('modal-error');
+window.registrarse = async function() {
+  const email = document.getElementById('reg-email').value.trim()
+  const pass  = document.getElementById('reg-pass').value
+  const err   = document.getElementById('modal-error')
 
   if (!email || !pass) {
-    err.textContent = 'Completa todos los campos.';
-    err.style.display = 'block';
-    return;
+    err.textContent = 'Completa todos los campos.'
+    err.style.display = 'block'
+    return
   }
   if (pass.length < 6) {
-    err.textContent = 'La contraseña debe tener mínimo 6 caracteres.';
-    err.style.display = 'block';
-    return;
+    err.textContent = 'La contraseña debe tener mínimo 6 caracteres.'
+    err.style.display = 'block'
+    return
   }
 
-  // Simulación registro exitoso
-  usuarioActual = { email };
-  cerrarModal();
-  document.querySelector('.btn-login').textContent = email.split('@')[0];
-  document.getElementById('aviso-login').style.display = 'none';
-  renderEncuesta();
+  const btn = document.querySelector('#form-registro .btn-enviar')
+  btn.textContent = 'Creando cuenta...'
+  btn.disabled = true
+
+  const resultado = await registro(email, pass)
+
+  btn.textContent = 'Crear cuenta'
+  btn.disabled = false
+
+  if (resultado.ok) {
+    window.cerrarModal()
+    mostrarToast('✓ Cuenta creada. Revisa tu correo para confirmar.')
+  } else {
+    err.textContent = resultado.mensaje
+    err.style.display = 'block'
+  }
 }
 
 // ══════════════════════════════════════════════
 //  COMPARTIR / DESCARGAR
 // ══════════════════════════════════════════════
-function descargarImagen() {
-  // html2canvas se integrará en el siguiente paso
-  alert('La descarga de imagen estará disponible en el siguiente paso (integración html2canvas).');
+window.descargarImagen = function() {
+  mostrarToast('La descarga de imagen llega en el paso 6.')
 }
 
-function compartirWhatsApp() {
-  const total = Object.values(votosSimulados).reduce((a, b) => a + b, 0);
-  const lider = CANDIDATOS.reduce((a, b) =>
-    (votosSimulados[b.id] || 0) > (votosSimulados[a.id] || 0) ? b : a
-  );
-  const pct = Math.round(((votosSimulados[lider.id] || 0) / total) * 100);
+window.compartirWhatsApp = function() {
+  const total = CANDIDATOS.reduce((a, c) => a + (c.votos || 0), 0)
+  if (total === 0) { mostrarToast('Aún no hay votos registrados.'); return }
+  const lider = CANDIDATOS.reduce((a, b) => (b.votos || 0) > (a.votos || 0) ? b : a)
+  const pct = Math.round(((lider.votos || 0) / total) * 100)
   const texto = encodeURIComponent(
     `📊 Encuesta Electoral Perú 2026\n` +
     `Líder: ${lider.nombre} con ${pct}%\n` +
     `Total: ${total.toLocaleString()} votos\n` +
     `Vota tú también 👉 ${window.location.href}`
-  );
-  window.open(`https://wa.me/?text=${texto}`, '_blank');
+  )
+  window.open(`https://wa.me/?text=${texto}`, '_blank')
 }
 
-function copiarEnlace() {
+window.copiarEnlace = function() {
   navigator.clipboard.writeText(window.location.href).then(() => {
-    alert('Enlace copiado al portapapeles.');
-  });
+    mostrarToast('✓ Enlace copiado al portapapeles.')
+  })
 }
 
 // ══════════════════════════════════════════════
-//  SOPORTE (simulado — EmailJS va en paso 4)
+//  SOPORTE (EmailJS llega en paso 5)
 // ══════════════════════════════════════════════
-function enviarSoporte() {
-  const nombre = document.getElementById('soporte-nombre').value.trim();
-  const email = document.getElementById('soporte-email').value.trim();
-  const mensaje = document.getElementById('soporte-mensaje').value.trim();
+window.enviarSoporte = function() {
+  const nombre  = document.getElementById('soporte-nombre').value.trim()
+  const email   = document.getElementById('soporte-email').value.trim()
+  const mensaje = document.getElementById('soporte-mensaje').value.trim()
 
   if (!nombre || !email || !mensaje) {
-    alert('Por favor completa todos los campos.');
-    return;
+    mostrarToast('Por favor completa todos los campos.', true)
+    return
   }
 
-  // Simulación: en paso 4 esto se conecta a EmailJS
-  document.getElementById('soporte-confirmacion').style.display = 'block';
-  document.getElementById('soporte-nombre').value = '';
-  document.getElementById('soporte-email').value = '';
-  document.getElementById('soporte-mensaje').value = '';
+  document.getElementById('soporte-confirmacion').style.display = 'block'
+  document.getElementById('soporte-nombre').value  = ''
+  document.getElementById('soporte-email').value   = ''
+  document.getElementById('soporte-mensaje').value = ''
 }
 
 // ══════════════════════════════════════════════
-//  INICIO
+//  TOAST
 // ══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  renderEncuesta();
-});
+function mostrarToast(mensaje, esError = false) {
+  const anterior = document.getElementById('toast-msg')
+  if (anterior) anterior.remove()
+
+  const toast = document.createElement('div')
+  toast.id = 'toast-msg'
+  toast.textContent = mensaje
+  toast.style.cssText = `
+    position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+    background:${esError ? '#C8102E' : '#0D0D0D'};color:white;
+    font-family:'DM Sans',sans-serif;font-size:0.88rem;
+    padding:10px 22px;border-radius:8px;z-index:9999;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  `
+  document.body.appendChild(toast)
+  setTimeout(() => toast.remove(), 3500)
+}
