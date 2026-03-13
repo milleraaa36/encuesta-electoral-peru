@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · VotaPerú 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rojo:#C8102E; --negro:#0D0D0D; --fondo:#F7F4EE;
+      --tarjeta:#FFFFFF; --borde:#D9D4CB; --gris:#6B6B6B;
+      --font-display:'Syne',sans-serif; --font-body:'DM Sans',sans-serif;
+    }
+    body { font-family:var(--font-body); background:var(--fondo); color:var(--negro); min-height:100vh; }
+
+    /* LOGIN */
+    #login-admin { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
+    .login-box { background:var(--tarjeta); border:1px solid var(--borde); border-radius:16px; padding:2.5rem; width:100%; max-width:380px; box-shadow:0 4px 24px rgba(0,0,0,0.08); }
+    .login-box h1 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin-bottom:.3rem; }
+    .login-box > p { font-size:.85rem; color:var(--gris); margin-bottom:1.5rem; }
+
+    /* PANEL */
+    #panel-admin { display:none; }
+    header { background:var(--negro); padding:0 2rem; border-bottom:3px solid var(--rojo); }
+    .header-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .logo { font-family:var(--font-display); font-weight:800; font-size:1rem; color:white; }
+    .logo span { color:var(--rojo); }
+    .header-right { font-size:.82rem; color:rgba(255,255,255,.6); display:flex; align-items:center; gap:12px; }
+    .btn-salir { font-family:var(--font-body); font-size:.8rem; padding:5px 14px; border:1px solid rgba(255,255,255,.2); border-radius:6px; background:transparent; color:white; cursor:pointer; }
+    .btn-salir:hover { background:rgba(255,255,255,.1); }
+
+    main { max-width:1100px; margin:0 auto; padding:2rem; }
+
+    /* STATS */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:1.5rem; }
+    .stat-card { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px; padding:1.2rem; }
+    .stat-label { font-size:.75rem; color:var(--gris); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .stat-valor { font-family:var(--font-display); font-size:1.8rem; font-weight:800; }
+
+    /* TABS */
+    .tabs { display:flex; gap:4px; margin-bottom:2rem; background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:4px; width:fit-content; }
+    .tab { font-family:var(--font-body); font-size:.85rem; font-weight:500; padding:8px 20px; border:none; border-radius:7px; background:transparent; color:var(--gris); cursor:pointer; transition:all .18s; }
+    .tab.activo { background:var(--negro); color:white; }
+    .panel { display:none; }
+    .panel.activo { display:block; }
+
+    /* CARDS */
+    .card { background:var(--tarjeta); border:1px solid var(--borde); border-radius:14px; padding:1.8rem; margin-bottom:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .card h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid var(--borde); }
+
+    /* FORMS */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-grid.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+    .form-grupo { display:flex; flex-direction:column; gap:5px; }
+    .form-grupo.full { grid-column:1 / -1; }
+    .form-grupo label { font-size:.78rem; font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
+    .form-grupo input, .form-grupo select, .form-grupo textarea {
+      font-family:var(--font-body); font-size:.9rem; padding:9px 12px;
+      border:1.5px solid var(--borde); border-radius:8px; background:var(--fondo);
+      color:var(--negro); outline:none; transition:border-color .18s; resize:vertical;
+    }
+    .form-grupo input:focus, .form-grupo select:focus, .form-grupo textarea:focus { border-color:var(--rojo); }
+    .hint { font-size:.75rem; color:var(--gris); }
+    .color-row { display:flex; align-items:center; gap:10px; }
+    .color-row input[type="color"] { width:44px; height:38px; padding:2px; border-radius:8px; cursor:pointer; flex-shrink:0; border:1.5px solid var(--borde); }
+    .color-row input[type="text"] { flex:1; }
+
+    /* BUTTONS */
+    .btn-primary { font-family:var(--font-display); font-size:.88rem; font-weight:700; padding:10px 24px; background:var(--rojo); color:white; border:none; border-radius:8px; cursor:pointer; transition:opacity .18s; margin-top:1rem; }
+    .btn-primary:hover { opacity:.88; }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-secondary { font-family:var(--font-body); font-size:.82rem; padding:6px 14px; background:transparent; color:var(--rojo); border:1.5px solid var(--rojo); border-radius:6px; cursor:pointer; transition:all .18s; }
+    .btn-secondary:hover { background:var(--rojo); color:white; }
+    .btn-danger { font-family:var(--font-body); font-size:.8rem; padding:5px 12px; background:transparent; color:#999; border:1px solid #ddd; border-radius:6px; cursor:pointer; transition:all .18s; }
+    .btn-danger:hover { color:var(--rojo); border-color:var(--rojo); }
+
+    /* LISTA */
+    .lista-items { margin-top:1.5rem; }
+    .lista-items h3 { font-family:var(--font-display); font-size:.9rem; font-weight:700; margin-bottom:1rem; color:var(--gris); text-transform:uppercase; letter-spacing:.05em; }
+    .item-row { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--fondo); border:1px solid var(--borde); border-radius:8px; margin-bottom:8px; }
+    .item-color { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .item-nombre { font-weight:500; font-size:.88rem; flex:1; }
+    .item-detalle { font-size:.78rem; color:var(--gris); }
+    .item-acciones { display:flex; gap:6px; }
+
+    /* ALERTAS */
+    .alerta { padding:10px 16px; border-radius:8px; font-size:.85rem; margin-top:1rem; display:none; }
+    .alerta.ok { background:#E8F5E8; color:#1A6B3C; border:1px solid #9FD99F; }
+    .alerta.error { background:#FFF0F0; color:var(--rojo); border:1px solid #F5C4C4; }
+
+    @media (max-width:640px) {
+      .form-grid, .form-grid.cols-3 { grid-template-columns:1fr; }
+      main { padding:1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN ADMIN -->
+<div id="login-admin">
+  <div class="login-box">
+    <h1>Panel de Admin</h1>
+    <p>Acceso restringido. Solo el administrador puede entrar.</p>
+    <div class="form-grupo" style="margin-bottom:12px">
+      <label>Correo</label>
+      <input type="email" id="admin-email" placeholder="tu@correo.com" />
+    </div>
+    <div class="form-grupo">
+      <label>Contraseña</label>
+      <input type="password" id="admin-pass" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') loginAdmin()" />
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:1.2rem" onclick="loginAdmin()">
+      Ingresar al panel
+    </button>
+    <p id="login-error" style="color:var(--rojo);font-size:.82rem;margin-top:.8rem;display:none"></p>
+  </div>
+</div>
+
+<!-- PANEL ADMIN -->
+<div id="panel-admin">
+  <header>
+    <div class="header-inner">
+      <div class="logo">VOTA<span>PERÚ</span>
+        <span style="color:rgba(255,255,255,.35);font-weight:400;font-size:.8rem"> · Admin</span>
+      </div>
+      <div class="header-right">
+        <span id="admin-nombre"></span>
+        <button class="btn-salir" onclick="salirAdmin()">Cerrar sesión</button>
+        <a href="index.html" style="color:rgba(255,255,255,.45);font-size:.8rem;text-decoration:none">← Ver sitio</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total votos</div><div class="stat-valor" id="stat-votos">—</div></div>
+      <div class="stat-card"><div class="stat-label">Partidos</div><div class="stat-valor" id="stat-partidos">—</div></div>
+      <div class="stat-card"><div class="stat-label">Candidatos</div><div class="stat-valor" id="stat-candidatos">—</div></div>
+      <div class="stat-card"><div class="stat-label">Registros únicos</div><div class="stat-valor" id="stat-registros">—</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab activo" onclick="cambiarPanel('partidos',this)">Partidos</button>
+      <button class="tab" onclick="cambiarPanel('candidatos',this)">Candidatos</button>
+      <button class="tab" onclick="cambiarPanel('resultados',this)">Resultados</button>
+    </div>
+
+    <!-- PARTIDOS -->
+    <div id="panel-partidos" class="panel activo">
+      <div class="card">
+        <h2>Agregar partido</h2>
+        <div class="form-grid">
+          <div class="form-grupo">
+            <label>Nombre completo</label>
+            <input type="text" id="p-nombre" placeholder="Ej: Fuerza Popular" />
+          </div>
+          <div class="form-grupo">
+            <label>Sigla</label>
+            <input type="text" id="p-sigla" placeholder="Ej: FP" maxlength="6" />
+          </div>
+          <div class="form-grupo">
+            <label>ID único (sin espacios ni tildes)</label>
+            <input type="text" id="p-id" placeholder="Ej: fuerza-popular" maxlength="20" />
+            <span class="hint">Solo letras minúsculas y guiones. Este ID no se puede cambiar después.</span>
+          </div>
+          <div class="form-grupo">
+            <label>Color del partido</label>
+            <div class="color-row">
+              <input type="color" id="p-color-picker" value="#C8102E"
+                     oninput="document.getElementById('p-color-text').value=this.value" />
+              <input type="text" id="p-color-text" value="#C8102E"
+                     oninput="document.getElementById('p-color-picker').value=this.value" />
+            </div>
+          </div>
+          <div class="form-grupo full">
+            <label>Propuestas principales (una por línea)</label>
+            <textarea id="p-propuestas" rows="4"
+              placeholder="Reducción del IGV al 16%&#10;Mano dura contra la corrupción&#10;Reactivación económica con inversión privada"></textarea>
+            <span class="hint">Escribe una propuesta por línea.</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="agregarPartido()">+ Guardar partido</button>
+        <div id="alerta-partido" class="alerta"></div>
+      </div>
+      <div class="lista-items">
+        <h3>Partidos registrados</h3>
+        <div id="lista-partidos-admin"><p style="color:var(--gris);font-size:.88rem">Cargando...</p></div>
+      </div>
+    </div>
+
+    <!-- CANDIDATOS -->
+    <div id="panel-candidatos" class="panel">
+      <div class="card">
+        <h2>Agregar candidato</h2>
+        <div class="form-grid cols-3">
+          <div class="form-grupo">
+            <label>Nombre completo</label>
+            <input type="text" id="c-nombre" placeholder="Ej: María López Rivas" />
+          </div>
+          <div class="form-grupo">
+            <label>Partido</label>
+            <select id="c-partido"><option value="">Seleccionar partido...</option></select>
+          </div>
+          <div class="form-grupo">
+            <label>Edad</label>
+            <input type="number" id="c-edad" placeholder="52" min="18" max="99" />
+          </div>
+          <div class="form-grupo">
+            <label>Lugar de nacimiento</label>
+            <input type="text" id="c-nacimiento" placeholder="Ej: Arequipa" />
+          </div>
+          <div class="form-grupo">
+            <label>N.° de denuncias</label>
+            <input type="number" id="c-denuncias" value="0" min="0" />
+          </div>
+          <div class="form-grupo">
+            <label>Resumen de experiencia</label>
+            <input type="text" id="c-experiencia" placeholder="Ej: 12 años en política" />
+          </div>
+          <div class="form-grupo full">
+            <label>Cargos previos (uno por línea)</label>
+            <textarea id="c-cargos" rows="3"
+              placeholder="Congresista 2016–2021&#10;Alcaldesa Arequipa 2010–2014"></textarea>
+            <span class="hint">Un cargo por línea.</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="agregarCandidato()">+ Guardar candidato</button>
+        <div id="alerta-candidato" class="alerta"></div>
+      </div>
+      <div class="lista-items">
+        <h3>Candidatos registrados</h3>
+        <div id="lista-candidatos-admin"><p style="color:var(--gris);font-size:.88rem">Cargando...</p></div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="panel-resultados" class="panel">
+      <div class="card">
+        <h2>Resultados en tiempo real</h2>
+        <div id="resultados-admin"><p style="color:var(--gris);font-size:.88rem">Cargando...</p></div>
+        <button class="btn-primary" style="margin-top:1rem" onclick="cargarResultados()">Actualizar</button>
+      </div>
+      <div class="card" style="border-left:3px solid var(--rojo)">
+        <h2 style="color:var(--rojo)">Zona de peligro</h2>
+        <p style="font-size:.85rem;color:var(--gris);margin-bottom:1rem">Reinicia todos los votos a cero. Irreversible.</p>
+        <button class="btn-secondary" onclick="confirmarResetVotos()">Reiniciar todos los votos</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const SUPABASE_URL = 'https://qbogqnfjohadkvonxuyb.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFib2dxbmZqb2hhZGt2b254dXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDE0MDksImV4cCI6MjA4ODkxNzQwOX0.odTFUYmtPNkNXqO7H1FbYZ_1S6fIVzB_NRuW3a3ldTQ'
+
+// ★ CAMBIA ESTO: pon el correo con el que te registraste en el sitio
+const ADMIN_EMAIL = 'tu-correo@gmail.com'
+
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
+let partidosCache = []
+
+// ── AUTH ──
+window.loginAdmin = async function() {
+  const email = document.getElementById('admin-email').value.trim()
+  const pass  = document.getElementById('admin-pass').value
+  const err   = document.getElementById('login-error')
+
+  if (!email || !pass) { mostrarErr(err, 'Completa todos los campos.'); return }
+  if (email !== ADMIN_EMAIL) { mostrarErr(err, 'No tienes permisos de administrador.'); return }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass })
+  if (error) { mostrarErr(err, 'Correo o contraseña incorrectos.'); return }
+  mostrarPanel(data.user)
+}
+
+window.salirAdmin = async function() {
+  await sb.auth.signOut()
+  location.reload()
+}
+
+sb.auth.onAuthStateChange((_e, session) => {
+  if (session?.user?.email === ADMIN_EMAIL) mostrarPanel(session.user)
+})
+
+function mostrarErr(el, msg) {
+  el.textContent = msg
+  el.style.display = 'block'
+}
+
+function mostrarPanel(user) {
+  document.getElementById('login-admin').style.display = 'none'
+  document.getElementById('panel-admin').style.display = 'block'
+  document.getElementById('admin-nombre').textContent = user.email
+  cargarTodo()
+}
+
+// ── DATOS ──
+async function cargarTodo() {
+  await Promise.all([cargarPartidos(), cargarCandidatos(), cargarStats(), cargarResultados()])
+}
+
+async function cargarStats() {
+  const [r1, r2, r3] = await Promise.all([
+    sb.from('partidos').select('*',{count:'exact',head:true}),
+    sb.from('candidatos').select('*',{count:'exact',head:true}),
+    sb.from('votos').select('*',{count:'exact',head:true})
+  ])
+  document.getElementById('stat-partidos').textContent   = r1.count ?? '—'
+  document.getElementById('stat-candidatos').textContent = r2.count ?? '—'
+  document.getElementById('stat-votos').textContent      = r3.count ?? '—'
+  document.getElementById('stat-registros').textContent  = r3.count ?? '—'
+}
+
+// ── PARTIDOS ──
+async function cargarPartidos() {
+  const { data } = await sb.from('partidos').select('*').order('nombre')
+  partidosCache = data || []
+  renderListaPartidos()
+  poblarSelectPartidos()
+}
+
+function renderListaPartidos() {
+  const cont = document.getElementById('lista-partidos-admin')
+  if (!cont) return
+  if (!partidosCache.length) {
+    cont.innerHTML = '<p style="color:var(--gris);font-size:.88rem">No hay partidos. Agrega el primero arriba.</p>'
+    return
+  }
+  cont.innerHTML = partidosCache.map(p => `
+    <div class="item-row">
+      <div class="item-color" style="background:${p.color}"></div>
+      <div class="item-nombre">${p.nombre}</div>
+      <div class="item-detalle">${p.sigla} · ${(p.propuestas||[]).length} propuestas</div>
+      <div class="item-acciones">
+        <button class="btn-danger" onclick="eliminarPartido('${p.id}')">Eliminar</button>
+      </div>
+    </div>`).join('')
+}
+
+function poblarSelectPartidos() {
+  const sel = document.getElementById('c-partido')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Seleccionar partido...</option>'
+  partidosCache.forEach(p => {
+    const o = document.createElement('option')
+    o.value = p.id; o.textContent = p.nombre
+    sel.appendChild(o)
+  })
+}
+
+window.agregarPartido = async function() {
+  const id        = document.getElementById('p-id').value.trim().toLowerCase().replace(/\s+/g,'-')
+  const nombre    = document.getElementById('p-nombre').value.trim()
+  const sigla     = document.getElementById('p-sigla').value.trim().toUpperCase()
+  const color     = document.getElementById('p-color-text').value.trim()
+  const propTxt   = document.getElementById('p-propuestas').value.trim()
+  const propuestas= propTxt ? propTxt.split('\n').map(s=>s.trim()).filter(Boolean) : []
+  const alerta    = document.getElementById('alerta-partido')
+
+  if (!id||!nombre||!sigla||!color) { mostrarAlerta(alerta,'Completa todos los campos obligatorios.',true); return }
+
+  const btn = document.querySelector('#panel-partidos .btn-primary')
+  btn.disabled=true; btn.textContent='Guardando...'
+
+  const { error } = await sb.from('partidos').insert({id,nombre,sigla,color,propuestas})
+  btn.disabled=false; btn.textContent='+ Guardar partido'
+
+  if (error) {
+    mostrarAlerta(alerta, error.code==='23505' ? 'Ya existe un partido con ese ID.' : 'Error: '+error.message, true)
+    return
+  }
+  mostrarAlerta(alerta, `✓ Partido "${nombre}" guardado.`)
+  limpiarFormPartido()
+  await cargarPartidos(); await cargarStats()
+}
+
+window.eliminarPartido = async function(id) {
+  if (!confirm(`¿Eliminar el partido "${id}"? No se puede deshacer.`)) return
+  await sb.from('partidos').delete().eq('id',id)
+  await cargarPartidos(); await cargarStats()
+}
+
+function limpiarFormPartido() {
+  ['p-id','p-nombre','p-sigla','p-propuestas'].forEach(i=>document.getElementById(i).value='')
+  document.getElementById('p-color-text').value='#C8102E'
+  document.getElementById('p-color-picker').value='#C8102E'
+}
+
+// ── CANDIDATOS ──
+async function cargarCandidatos() {
+  const { data } = await sb.from('candidatos').select('*').order('nombre')
+  renderListaCandidatos(data||[])
+}
+
+function renderListaCandidatos(lista) {
+  const cont = document.getElementById('lista-candidatos-admin')
+  if (!cont) return
+  if (!lista.length) {
+    cont.innerHTML = '<p style="color:var(--gris);font-size:.88rem">No hay candidatos. Agrega el primero arriba.</p>'
+    return
+  }
+  cont.innerHTML = lista.map(c => {
+    const p = partidosCache.find(x=>x.id===c.partido_id)||{}
+    return `
+      <div class="item-row">
+        <div class="item-color" style="background:${p.color||'#999'}"></div>
+        <div class="item-nombre">${c.nombre}</div>
+        <div class="item-detalle">${p.nombre||c.partido_id} · ${c.edad} años · ${c.denuncias} denuncias · ${c.votos||0} votos</div>
+        <div class="item-acciones">
+          <button class="btn-danger" onclick="eliminarCandidato(${c.id})">Eliminar</button>
+        </div>
+      </div>`
+  }).join('')
+}
+
+window.agregarCandidato = async function() {
+  const nombre     = document.getElementById('c-nombre').value.trim()
+  const partido_id = document.getElementById('c-partido').value
+  const edad       = parseInt(document.getElementById('c-edad').value)
+  const nacimiento = document.getElementById('c-nacimiento').value.trim()
+  const denuncias  = parseInt(document.getElementById('c-denuncias').value)||0
+  const experiencia= document.getElementById('c-experiencia').value.trim()
+  const cargosTxt  = document.getElementById('c-cargos').value.trim()
+  const cargos     = cargosTxt ? cargosTxt.split('\n').map(s=>s.trim()).filter(Boolean) : []
+  const alerta     = document.getElementById('alerta-candidato')
+
+  if (!nombre||!partido_id||!edad||!nacimiento) {
+    mostrarAlerta(alerta,'Completa: nombre, partido, edad y nacimiento.',true); return
+  }
+
+  const btn = document.querySelector('#panel-candidatos .btn-primary')
+  btn.disabled=true; btn.textContent='Guardando...'
+
+  const { error } = await sb.from('candidatos').insert({nombre,partido_id,edad,nacimiento,denuncias,experiencia,cargos,votos:0})
+  btn.disabled=false; btn.textContent='+ Guardar candidato'
+
+  if (error) { mostrarAlerta(alerta,'Error: '+error.message,true); return }
+  mostrarAlerta(alerta, `✓ Candidato "${nombre}" guardado.`)
+  limpiarFormCandidato()
+  await cargarCandidatos(); await cargarStats()
+}
+
+window.eliminarCandidato = async function(id) {
+  if (!confirm('¿Eliminar este candidato? Sus votos también se perderán.')) return
+  await sb.from('candidatos').delete().eq('id',id)
+  await cargarCandidatos(); await cargarStats()
+}
+
+function limpiarFormCandidato() {
+  ['c-nombre','c-edad','c-nacimiento','c-experiencia','c-cargos'].forEach(i=>document.getElementById(i).value='')
+  document.getElementById('c-denuncias').value='0'
+  document.getElementById('c-partido').value=''
+}
+
+// ── RESULTADOS ──
+window.cargarResultados = async function() {
+  const { data } = await sb.from('candidatos').select('nombre,votos,partido_id').order('votos',{ascending:false})
+  const cont = document.getElementById('resultados-admin')
+  if (!data||!data.length) { cont.innerHTML='<p style="color:var(--gris);font-size:.88rem">Aún no hay votos.</p>'; return }
+  const total = data.reduce((a,c)=>a+(c.votos||0),0)
+  cont.innerHTML = data.map(c => {
+    const p = partidosCache.find(x=>x.id===c.partido_id)||{}
+    const pct = total>0 ? Math.round(((c.votos||0)/total)*100) : 0
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.88rem">
+          <span><strong>${c.nombre}</strong> <span style="color:var(--gris)">${p.nombre||''}</span></span>
+          <span style="font-family:var(--font-display);font-weight:700">${pct}% · ${(c.votos||0).toLocaleString()} votos</span>
+        </div>
+        <div style="background:#E8E4DC;border-radius:4px;height:8px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${p.color||'var(--rojo)'};border-radius:4px"></div>
+        </div>
+      </div>`
+  }).join('') + `<p style="font-size:.82rem;color:var(--gris);margin-top:1rem">Total: ${total.toLocaleString()} votos</p>`
+}
+
+window.confirmarResetVotos = async function() {
+  if (prompt('Escribe CONFIRMAR para reiniciar todos los votos:') !== 'CONFIRMAR') return
+  await sb.from('candidatos').update({votos:0}).neq('id',0)
+  await sb.from('votos').delete().neq('id',0)
+  alert('✓ Votos reiniciados correctamente.')
+  await cargarTodo()
+}
+
+// ── HELPERS ──
+window.cambiarPanel = function(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('activo'))
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('activo'))
+  document.getElementById('panel-'+id).classList.add('activo')
+  btn.classList.add('activo')
+  if (id==='resultados') cargarResultados()
+}
+
+function mostrarAlerta(el, msg, esError=false) {
+  el.textContent=msg
+  el.className='alerta '+(esError?'error':'ok')
+  el.style.display='block'
+  setTimeout(()=>el.style.display='none', 4000)
+}
+</script>
+</body>
+</html>
