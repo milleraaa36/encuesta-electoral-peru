@@ -191,7 +191,10 @@ function renderPartidos() {
   contenedor.innerHTML = PARTIDOS.map(p => `
     <div class="tarjeta">
       <div class="partido-header">
-        <div class="partido-logo" style="background:${p.color}">${p.sigla}</div>
+        ${p.logo_url
+          ? `<img src="${p.logo_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0" alt="${p.nombre}" />`
+          : `<div class="partido-logo" style="background:${p.color}">${p.sigla}</div>`
+        }
         <div>
           <div class="partido-nombre">${p.nombre}</div>
           <div class="partido-sigla">Partido político</div>
@@ -237,10 +240,13 @@ window.renderCandidatos = function() {
   contenedor.innerHTML = lista.map(c => {
     const partido = PARTIDOS.find(p => p.id === c.partido_id) || {}
     const iniciales = c.nombre.split(' ').slice(0, 2).map(n => n[0]).join('')
+    const avatarHtml = c.foto_url
+      ? `<img src="${c.foto_url}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;margin-bottom:4px;border:2px solid var(--borde)" alt="${c.nombre}" />`
+      : `<div class="candidato-avatar" style="background:${partido.color || '#999'}">${iniciales}</div>`
 
     return `
       <div class="candidato-card">
-        <div class="candidato-avatar" style="background:${partido.color || '#999'}">${iniciales}</div>
+        ${avatarHtml}
         <h3>${c.nombre}</h3>
         <span class="partido-tag" style="background:${partido.color || '#999'}">${partido.nombre || ''}</span>
         <div class="dato-grid">
