@@ -454,13 +454,26 @@ function mostrarPanel(user) {
 window.previewImagen = function(input, previewId) {
   const file = input.files[0]
   if (!file) return
+
+  // Validar tamaño (max 2MB)
+  if (file.size > 2 * 1024 * 1024) {
+    alert('La imagen es demasiado grande. Máximo 2MB.')
+    input.value = ''
+    return
+  }
+
   const preview = document.getElementById(previewId)
-  const reader = new FileReader()
+  const reader  = new FileReader()
+
   reader.onload = e => {
     preview.src = e.target.result
     preview.style.display = 'block'
-    const uploadText = input.parentElement.querySelector('.upload-text')
-    if (uploadText) uploadText.style.display = 'none'
+    // Ocultar el texto del área de upload
+    const area = input.closest('.upload-area')
+    if (area) {
+      const txt = area.querySelector('.upload-text')
+      if (txt) txt.style.display = 'none'
+    }
   }
   reader.readAsDataURL(file)
 }
