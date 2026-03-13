@@ -14,46 +14,45 @@
     }
     body { font-family:var(--font-body); background:var(--fondo); color:var(--negro); min-height:100vh; }
 
-    /* LOGIN */
+    /* ── LOGIN ── */
     #login-admin { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
-    .login-box { background:var(--tarjeta); border:1px solid var(--borde); border-radius:16px; padding:2.5rem; width:100%; max-width:380px; box-shadow:0 4px 24px rgba(0,0,0,0.08); }
+    .login-box { background:var(--tarjeta); border:1px solid var(--borde); border-radius:16px; padding:2.5rem; width:100%; max-width:380px; box-shadow:0 4px 24px rgba(0,0,0,.08); }
     .login-box h1 { font-family:var(--font-display); font-size:1.5rem; font-weight:800; margin-bottom:.3rem; }
     .login-box > p { font-size:.85rem; color:var(--gris); margin-bottom:1.5rem; }
 
-    /* PANEL */
+    /* ── PANEL ── */
     #panel-admin { display:none; }
     header { background:var(--negro); padding:0 2rem; border-bottom:3px solid var(--rojo); }
-    .header-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
     .logo { font-family:var(--font-display); font-weight:800; font-size:1rem; color:white; }
     .logo span { color:var(--rojo); }
     .header-right { font-size:.82rem; color:rgba(255,255,255,.6); display:flex; align-items:center; gap:12px; }
     .btn-salir { font-family:var(--font-body); font-size:.8rem; padding:5px 14px; border:1px solid rgba(255,255,255,.2); border-radius:6px; background:transparent; color:white; cursor:pointer; }
     .btn-salir:hover { background:rgba(255,255,255,.1); }
+    main { max-width:1200px; margin:0 auto; padding:2rem; }
 
-    main { max-width:1100px; margin:0 auto; padding:2rem; }
-
-    /* STATS */
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:1.5rem; }
+    /* ── STATS ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:1.5rem; }
     .stat-card { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px; padding:1.2rem; }
-    .stat-label { font-size:.75rem; color:var(--gris); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .stat-label { font-size:.72rem; color:var(--gris); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
     .stat-valor { font-family:var(--font-display); font-size:1.8rem; font-weight:800; }
 
-    /* TABS */
+    /* ── TABS ── */
     .tabs { display:flex; gap:4px; margin-bottom:2rem; background:var(--tarjeta); border:1px solid var(--borde); border-radius:10px; padding:4px; width:fit-content; }
     .tab { font-family:var(--font-body); font-size:.85rem; font-weight:500; padding:8px 20px; border:none; border-radius:7px; background:transparent; color:var(--gris); cursor:pointer; transition:all .18s; }
     .tab.activo { background:var(--negro); color:white; }
     .panel { display:none; }
     .panel.activo { display:block; }
 
-    /* CARDS */
+    /* ── CARDS ── */
     .card { background:var(--tarjeta); border:1px solid var(--borde); border-radius:14px; padding:1.8rem; margin-bottom:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.05); }
     .card h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid var(--borde); }
 
-    /* FORMS */
+    /* ── FORMS ── */
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .form-grid.cols-3 { grid-template-columns:1fr 1fr 1fr; }
     .form-grupo { display:flex; flex-direction:column; gap:5px; }
-    .form-grupo.full { grid-column:1 / -1; }
+    .form-grupo.full { grid-column:1/-1; }
     .form-grupo label { font-size:.78rem; font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
     .form-grupo input, .form-grupo select, .form-grupo textarea {
       font-family:var(--font-body); font-size:.9rem; padding:9px 12px;
@@ -62,46 +61,84 @@
     }
     .form-grupo input:focus, .form-grupo select:focus, .form-grupo textarea:focus { border-color:var(--rojo); }
     .hint { font-size:.75rem; color:var(--gris); }
+
     .color-row { display:flex; align-items:center; gap:10px; }
     .color-row input[type="color"] { width:44px; height:38px; padding:2px; border-radius:8px; cursor:pointer; flex-shrink:0; border:1.5px solid var(--borde); }
     .color-row input[type="text"] { flex:1; }
 
-    /* BUTTONS */
+    /* ── UPLOAD IMAGE ── */
+    .upload-area {
+      border:2px dashed var(--borde); border-radius:10px; padding:1.2rem;
+      text-align:center; cursor:pointer; transition:all .18s; background:var(--fondo);
+      position:relative;
+    }
+    .upload-area:hover { border-color:var(--rojo); background:#FFF5F6; }
+    .upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-preview {
+      width:64px; height:64px; border-radius:50%; object-fit:cover;
+      border:2px solid var(--borde); margin:0 auto 8px; display:block;
+    }
+    .upload-preview.partido { border-radius:10px; }
+    .upload-text { font-size:.82rem; color:var(--gris); }
+    .upload-text strong { color:var(--rojo); }
+
+    /* ── BUTTONS ── */
     .btn-primary { font-family:var(--font-display); font-size:.88rem; font-weight:700; padding:10px 24px; background:var(--rojo); color:white; border:none; border-radius:8px; cursor:pointer; transition:opacity .18s; margin-top:1rem; }
     .btn-primary:hover { opacity:.88; }
     .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
-    .btn-secondary { font-family:var(--font-body); font-size:.82rem; padding:6px 14px; background:transparent; color:var(--rojo); border:1.5px solid var(--rojo); border-radius:6px; cursor:pointer; transition:all .18s; }
-    .btn-secondary:hover { background:var(--rojo); color:white; }
+    .btn-edit { font-family:var(--font-body); font-size:.8rem; padding:5px 12px; background:transparent; color:#2563EB; border:1px solid #2563EB; border-radius:6px; cursor:pointer; transition:all .18s; }
+    .btn-edit:hover { background:#2563EB; color:white; }
     .btn-danger { font-family:var(--font-body); font-size:.8rem; padding:5px 12px; background:transparent; color:#999; border:1px solid #ddd; border-radius:6px; cursor:pointer; transition:all .18s; }
     .btn-danger:hover { color:var(--rojo); border-color:var(--rojo); }
+    .btn-secondary { font-family:var(--font-body); font-size:.82rem; padding:6px 14px; background:transparent; color:var(--rojo); border:1.5px solid var(--rojo); border-radius:6px; cursor:pointer; transition:all .18s; }
+    .btn-secondary:hover { background:var(--rojo); color:white; }
 
-    /* LISTA */
+    /* ── LISTA ITEMS ── */
     .lista-items { margin-top:1.5rem; }
     .lista-items h3 { font-family:var(--font-display); font-size:.9rem; font-weight:700; margin-bottom:1rem; color:var(--gris); text-transform:uppercase; letter-spacing:.05em; }
-    .item-row { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--fondo); border:1px solid var(--borde); border-radius:8px; margin-bottom:8px; }
-    .item-color { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-    .item-nombre { font-weight:500; font-size:.88rem; flex:1; }
+    .item-row { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--fondo); border:1px solid var(--borde); border-radius:10px; margin-bottom:8px; transition:box-shadow .18s; }
+    .item-row:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .item-img { width:38px; height:38px; border-radius:50%; object-fit:cover; border:1.5px solid var(--borde); flex-shrink:0; background:var(--gris-claro); }
+    .item-img.partido { border-radius:8px; }
+    .item-img-placeholder { width:38px; height:38px; border-radius:50%; background:var(--borde); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:.85rem; color:white; flex-shrink:0; }
+    .item-img-placeholder.partido { border-radius:8px; }
+    .item-nombre { font-weight:500; font-size:.9rem; flex:1; }
     .item-detalle { font-size:.78rem; color:var(--gris); }
-    .item-acciones { display:flex; gap:6px; }
+    .item-acciones { display:flex; gap:6px; flex-shrink:0; }
 
-    /* ALERTAS */
+    /* ── MODAL EDITAR ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; align-items:center; justify-content:center; padding:1rem; overflow-y:auto; }
+    .modal-overlay.abierto { display:flex; }
+    .modal { background:var(--tarjeta); border-radius:16px; padding:2rem; width:100%; max-width:640px; box-shadow:0 20px 60px rgba(0,0,0,.2); position:relative; max-height:90vh; overflow-y:auto; }
+    .modal h2 { font-family:var(--font-display); font-size:1.2rem; font-weight:800; margin-bottom:1.2rem; padding-bottom:.8rem; border-bottom:1px solid var(--borde); }
+    .modal-cerrar { position:absolute; top:1rem; right:1.2rem; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--gris); }
+    .modal-btns { display:flex; gap:10px; margin-top:1.2rem; justify-content:flex-end; }
+    .btn-guardar { font-family:var(--font-display); font-size:.88rem; font-weight:700; padding:9px 22px; background:var(--rojo); color:white; border:none; border-radius:8px; cursor:pointer; }
+    .btn-cancelar { font-family:var(--font-body); font-size:.85rem; padding:9px 18px; background:transparent; color:var(--gris); border:1.5px solid var(--borde); border-radius:8px; cursor:pointer; }
+
+    /* ── ALERTAS ── */
     .alerta { padding:10px 16px; border-radius:8px; font-size:.85rem; margin-top:1rem; display:none; }
     .alerta.ok { background:#E8F5E8; color:#1A6B3C; border:1px solid #9FD99F; }
     .alerta.error { background:#FFF0F0; color:var(--rojo); border:1px solid #F5C4C4; }
 
+    /* ── PROGRESS ── */
+    .progress-bar { height:4px; background:var(--borde); border-radius:4px; margin-top:8px; overflow:hidden; display:none; }
+    .progress-fill { height:100%; background:var(--rojo); border-radius:4px; transition:width .3s; }
+
     @media (max-width:640px) {
       .form-grid, .form-grid.cols-3 { grid-template-columns:1fr; }
       main { padding:1rem; }
+      .item-detalle { display:none; }
     }
   </style>
 </head>
 <body>
 
-<!-- LOGIN ADMIN -->
+<!-- ══ LOGIN ══ -->
 <div id="login-admin">
   <div class="login-box">
     <h1>Panel de Admin</h1>
-    <p>Acceso restringido. Solo el administrador puede entrar.</p>
+    <p>Acceso restringido al administrador.</p>
     <div class="form-grupo" style="margin-bottom:12px">
       <label>Correo</label>
       <input type="email" id="admin-email" placeholder="tu@correo.com" />
@@ -118,38 +155,36 @@
   </div>
 </div>
 
-<!-- PANEL ADMIN -->
+<!-- ══ PANEL ══ -->
 <div id="panel-admin">
   <header>
     <div class="header-inner">
       <div class="logo">VOTA<span>PERÚ</span>
-        <span style="color:rgba(255,255,255,.35);font-weight:400;font-size:.8rem"> · Admin</span>
+        <span style="color:rgba(255,255,255,.3);font-weight:400;font-size:.8rem"> · Admin</span>
       </div>
       <div class="header-right">
         <span id="admin-nombre"></span>
         <button class="btn-salir" onclick="salirAdmin()">Cerrar sesión</button>
-        <a href="index.html" style="color:rgba(255,255,255,.45);font-size:.8rem;text-decoration:none">← Ver sitio</a>
+        <a href="index.html" style="color:rgba(255,255,255,.4);font-size:.8rem;text-decoration:none">← Ver sitio</a>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- Stats -->
     <div class="stats-grid">
-      <div class="stat-card"><div class="stat-label">Total votos</div><div class="stat-valor" id="stat-votos">—</div></div>
+      <div class="stat-card"><div class="stat-label">Votos totales</div><div class="stat-valor" id="stat-votos">—</div></div>
       <div class="stat-card"><div class="stat-label">Partidos</div><div class="stat-valor" id="stat-partidos">—</div></div>
       <div class="stat-card"><div class="stat-label">Candidatos</div><div class="stat-valor" id="stat-candidatos">—</div></div>
-      <div class="stat-card"><div class="stat-label">Registros únicos</div><div class="stat-valor" id="stat-registros">—</div></div>
+      <div class="stat-card"><div class="stat-label">Votantes únicos</div><div class="stat-valor" id="stat-votantes">—</div></div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <button class="tab activo" onclick="cambiarPanel('partidos',this)">Partidos</button>
       <button class="tab" onclick="cambiarPanel('candidatos',this)">Candidatos</button>
       <button class="tab" onclick="cambiarPanel('resultados',this)">Resultados</button>
     </div>
 
-    <!-- PARTIDOS -->
+    <!-- ══ PANEL PARTIDOS ══ -->
     <div id="panel-partidos" class="panel activo">
       <div class="card">
         <h2>Agregar partido</h2>
@@ -165,7 +200,7 @@
           <div class="form-grupo">
             <label>ID único (sin espacios ni tildes)</label>
             <input type="text" id="p-id" placeholder="Ej: fuerza-popular" maxlength="20" />
-            <span class="hint">Solo letras minúsculas y guiones. Este ID no se puede cambiar después.</span>
+            <span class="hint">Solo letras minúsculas y guiones. No se puede cambiar después.</span>
           </div>
           <div class="form-grupo">
             <label>Color del partido</label>
@@ -176,23 +211,33 @@
                      oninput="document.getElementById('p-color-picker').value=this.value" />
             </div>
           </div>
-          <div class="form-grupo full">
+          <div class="form-grupo">
+            <label>Logo del partido</label>
+            <div class="upload-area" id="upload-area-partido">
+              <input type="file" id="p-logo" accept="image/*" onchange="previewImagen(this,'preview-logo','upload-area-partido')" />
+              <img id="preview-logo" class="upload-preview partido" src="" alt="" style="display:none" />
+              <div class="upload-text"><strong>Click para subir</strong> o arrastra aquí<br>PNG, JPG hasta 2MB</div>
+            </div>
+          </div>
+          <div class="form-grupo">
             <label>Propuestas principales (una por línea)</label>
-            <textarea id="p-propuestas" rows="4"
-              placeholder="Reducción del IGV al 16%&#10;Mano dura contra la corrupción&#10;Reactivación económica con inversión privada"></textarea>
-            <span class="hint">Escribe una propuesta por línea.</span>
+            <textarea id="p-propuestas" rows="5"
+              placeholder="Reducción del IGV al 16%&#10;Mano dura contra la corrupción&#10;Reactivación económica"></textarea>
+            <span class="hint">Una propuesta por línea.</span>
           </div>
         </div>
+        <div class="progress-bar" id="progress-partido"><div class="progress-fill" id="progress-partido-fill" style="width:0%"></div></div>
         <button class="btn-primary" onclick="agregarPartido()">+ Guardar partido</button>
         <div id="alerta-partido" class="alerta"></div>
       </div>
+
       <div class="lista-items">
         <h3>Partidos registrados</h3>
         <div id="lista-partidos-admin"><p style="color:var(--gris);font-size:.88rem">Cargando...</p></div>
       </div>
     </div>
 
-    <!-- CANDIDATOS -->
+    <!-- ══ PANEL CANDIDATOS ══ -->
     <div id="panel-candidatos" class="panel">
       <div class="card">
         <h2>Agregar candidato</h2>
@@ -222,22 +267,32 @@
             <input type="text" id="c-experiencia" placeholder="Ej: 12 años en política" />
           </div>
           <div class="form-grupo full">
+            <label>Foto del candidato</label>
+            <div class="upload-area" id="upload-area-candidato" style="max-width:280px">
+              <input type="file" id="c-foto" accept="image/*" onchange="previewImagen(this,'preview-foto','upload-area-candidato')" />
+              <img id="preview-foto" class="upload-preview" src="" alt="" style="display:none" />
+              <div class="upload-text"><strong>Click para subir</strong> o arrastra aquí<br>PNG, JPG hasta 2MB</div>
+            </div>
+          </div>
+          <div class="form-grupo full">
             <label>Cargos previos (uno por línea)</label>
             <textarea id="c-cargos" rows="3"
               placeholder="Congresista 2016–2021&#10;Alcaldesa Arequipa 2010–2014"></textarea>
             <span class="hint">Un cargo por línea.</span>
           </div>
         </div>
+        <div class="progress-bar" id="progress-candidato"><div class="progress-fill" id="progress-candidato-fill" style="width:0%"></div></div>
         <button class="btn-primary" onclick="agregarCandidato()">+ Guardar candidato</button>
         <div id="alerta-candidato" class="alerta"></div>
       </div>
+
       <div class="lista-items">
         <h3>Candidatos registrados</h3>
         <div id="lista-candidatos-admin"><p style="color:var(--gris);font-size:.88rem">Cargando...</p></div>
       </div>
     </div>
 
-    <!-- RESULTADOS -->
+    <!-- ══ PANEL RESULTADOS ══ -->
     <div id="panel-resultados" class="panel">
       <div class="card">
         <h2>Resultados en tiempo real</h2>
@@ -254,45 +309,137 @@
   </main>
 </div>
 
+<!-- ══ MODAL EDITAR PARTIDO ══ -->
+<div class="modal-overlay" id="modal-partido" onclick="cerrarModalSiFuera(event,'modal-partido')">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModal('modal-partido')">✕</button>
+    <h2>Editar partido</h2>
+    <input type="hidden" id="edit-p-id-original" />
+    <div class="form-grid">
+      <div class="form-grupo">
+        <label>Nombre completo</label>
+        <input type="text" id="edit-p-nombre" />
+      </div>
+      <div class="form-grupo">
+        <label>Sigla</label>
+        <input type="text" id="edit-p-sigla" maxlength="6" />
+      </div>
+      <div class="form-grupo">
+        <label>Color</label>
+        <div class="color-row">
+          <input type="color" id="edit-p-color-picker"
+                 oninput="document.getElementById('edit-p-color-text').value=this.value" />
+          <input type="text" id="edit-p-color-text"
+                 oninput="document.getElementById('edit-p-color-picker').value=this.value" />
+        </div>
+      </div>
+      <div class="form-grupo">
+        <label>Cambiar logo (opcional)</label>
+        <div class="upload-area" style="padding:.8rem">
+          <input type="file" id="edit-p-logo" accept="image/*"
+                 onchange="previewImagen(this,'edit-preview-logo','edit-upload-logo')" />
+          <img id="edit-preview-logo" class="upload-preview partido" src="" alt="" style="display:none;width:48px;height:48px" />
+          <div class="upload-text" style="font-size:.78rem"><strong>Cambiar imagen</strong></div>
+        </div>
+      </div>
+      <div class="form-grupo full">
+        <label>Propuestas (una por línea)</label>
+        <textarea id="edit-p-propuestas" rows="5"></textarea>
+      </div>
+    </div>
+    <div class="progress-bar" id="progress-edit-partido"><div class="progress-fill" id="progress-edit-partido-fill" style="width:0%"></div></div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modal-partido')">Cancelar</button>
+      <button class="btn-guardar" onclick="guardarEdicionPartido()">Guardar cambios</button>
+    </div>
+    <div id="alerta-edit-partido" class="alerta"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL EDITAR CANDIDATO ══ -->
+<div class="modal-overlay" id="modal-candidato" onclick="cerrarModalSiFuera(event,'modal-candidato')">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModal('modal-candidato')">✕</button>
+    <h2>Editar candidato</h2>
+    <input type="hidden" id="edit-c-id" />
+    <div class="form-grid cols-3">
+      <div class="form-grupo">
+        <label>Nombre completo</label>
+        <input type="text" id="edit-c-nombre" />
+      </div>
+      <div class="form-grupo">
+        <label>Partido</label>
+        <select id="edit-c-partido"></select>
+      </div>
+      <div class="form-grupo">
+        <label>Edad</label>
+        <input type="number" id="edit-c-edad" min="18" max="99" />
+      </div>
+      <div class="form-grupo">
+        <label>Lugar de nacimiento</label>
+        <input type="text" id="edit-c-nacimiento" />
+      </div>
+      <div class="form-grupo">
+        <label>N.° de denuncias</label>
+        <input type="number" id="edit-c-denuncias" min="0" />
+      </div>
+      <div class="form-grupo">
+        <label>Experiencia</label>
+        <input type="text" id="edit-c-experiencia" />
+      </div>
+      <div class="form-grupo full">
+        <label>Cambiar foto (opcional)</label>
+        <div class="upload-area" style="max-width:240px;padding:.8rem">
+          <input type="file" id="edit-c-foto" accept="image/*"
+                 onchange="previewImagen(this,'edit-preview-foto','edit-upload-foto')" />
+          <img id="edit-preview-foto" class="upload-preview" src="" alt="" style="display:none;width:48px;height:48px" />
+          <div class="upload-text" style="font-size:.78rem"><strong>Cambiar foto</strong></div>
+        </div>
+      </div>
+      <div class="form-grupo full">
+        <label>Cargos previos (uno por línea)</label>
+        <textarea id="edit-c-cargos" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="progress-bar" id="progress-edit-candidato"><div class="progress-fill" id="progress-edit-candidato-fill" style="width:0%"></div></div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modal-candidato')">Cancelar</button>
+      <button class="btn-guardar" onclick="guardarEdicionCandidato()">Guardar cambios</button>
+    </div>
+    <div id="alerta-edit-candidato" class="alerta"></div>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const SUPABASE_URL = 'https://qbogqnfjohadkvonxuyb.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFib2dxbmZqb2hhZGt2b254dXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDE0MDksImV4cCI6MjA4ODkxNzQwOX0.odTFUYmtPNkNXqO7H1FbYZ_1S6fIVzB_NRuW3a3ldTQ'
-
-// ★ CAMBIA ESTO: pon el correo con el que te registraste en el sitio
-const ADMIN_EMAIL = 'milleraaa36@gmail.com'
+const SUPABASE_URL  = 'https://qbogqnfjohadkvonxuyb.supabase.co'
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFib2dxbmZqb2hhZGt2b254dXliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDE0MDksImV4cCI6MjA4ODkxNzQwOX0.odTFUYmtPNkNXqO7H1FbYZ_1S6fIVzB_NRuW3a3ldTQ'
+const ADMIN_EMAIL   = 'milleraaa36@gmail.com' // ← CAMBIA ESTO
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
 let partidosCache = []
+let candidatosCache = []
 
-// ── AUTH ──
+// ══════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════
 window.loginAdmin = async function() {
   const email = document.getElementById('admin-email').value.trim()
   const pass  = document.getElementById('admin-pass').value
   const err   = document.getElementById('login-error')
-
-  if (!email || !pass) { mostrarErr(err, 'Completa todos los campos.'); return }
-  if (email !== ADMIN_EMAIL) { mostrarErr(err, 'No tienes permisos de administrador.'); return }
-
+  if (!email||!pass) { err.textContent='Completa todos los campos.'; err.style.display='block'; return }
+  if (email!==ADMIN_EMAIL) { err.textContent='No tienes permisos de administrador.'; err.style.display='block'; return }
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass })
-  if (error) { mostrarErr(err, 'Correo o contraseña incorrectos.'); return }
+  if (error) { err.textContent='Correo o contraseña incorrectos.'; err.style.display='block'; return }
   mostrarPanel(data.user)
 }
 
-window.salirAdmin = async function() {
-  await sb.auth.signOut()
-  location.reload()
-}
+window.salirAdmin = async function() { await sb.auth.signOut(); location.reload() }
 
 sb.auth.onAuthStateChange((_e, session) => {
   if (session?.user?.email === ADMIN_EMAIL) mostrarPanel(session.user)
 })
-
-function mostrarErr(el, msg) {
-  el.textContent = msg
-  el.style.display = 'block'
-}
 
 function mostrarPanel(user) {
   document.getElementById('login-admin').style.display = 'none'
@@ -301,27 +448,67 @@ function mostrarPanel(user) {
   cargarTodo()
 }
 
-// ── DATOS ──
+// ══════════════════════════════════════════════
+//  IMAGEN PREVIEW
+// ══════════════════════════════════════════════
+window.previewImagen = function(input, previewId) {
+  const file = input.files[0]
+  if (!file) return
+  const preview = document.getElementById(previewId)
+  const reader = new FileReader()
+  reader.onload = e => {
+    preview.src = e.target.result
+    preview.style.display = 'block'
+    const uploadText = input.parentElement.querySelector('.upload-text')
+    if (uploadText) uploadText.style.display = 'none'
+  }
+  reader.readAsDataURL(file)
+}
+
+async function subirImagen(file, carpeta, progressBarId, progressFillId) {
+  if (!file) return null
+  const ext  = file.name.split('.').pop()
+  const nombre = `${carpeta}/${Date.now()}.${ext}`
+
+  const bar  = document.getElementById(progressBarId)
+  const fill = document.getElementById(progressFillId)
+  if (bar) { bar.style.display='block'; fill.style.width='30%' }
+
+  const { data, error } = await sb.storage.from('imagenes').upload(nombre, file, { upsert: true })
+  if (error) { console.error('Error subiendo imagen:', error); return null }
+
+  if (fill) fill.style.width = '100%'
+  setTimeout(() => { if (bar) bar.style.display='none'; if (fill) fill.style.width='0%' }, 800)
+
+  const { data: urlData } = sb.storage.from('imagenes').getPublicUrl(nombre)
+  return urlData.publicUrl
+}
+
+// ══════════════════════════════════════════════
+//  CARGAR TODO
+// ══════════════════════════════════════════════
 async function cargarTodo() {
   await Promise.all([cargarPartidos(), cargarCandidatos(), cargarStats(), cargarResultados()])
 }
 
 async function cargarStats() {
-  const [r1, r2, r3] = await Promise.all([
+  const [r1,r2,r3] = await Promise.all([
     sb.from('partidos').select('*',{count:'exact',head:true}),
     sb.from('candidatos').select('*',{count:'exact',head:true}),
     sb.from('votos').select('*',{count:'exact',head:true})
   ])
-  document.getElementById('stat-partidos').textContent   = r1.count ?? '—'
-  document.getElementById('stat-candidatos').textContent = r2.count ?? '—'
-  document.getElementById('stat-votos').textContent      = r3.count ?? '—'
-  document.getElementById('stat-registros').textContent  = r3.count ?? '—'
+  document.getElementById('stat-partidos').textContent   = r1.count??'—'
+  document.getElementById('stat-candidatos').textContent = r2.count??'—'
+  document.getElementById('stat-votos').textContent      = r3.count??'—'
+  document.getElementById('stat-votantes').textContent   = r3.count??'—'
 }
 
-// ── PARTIDOS ──
+// ══════════════════════════════════════════════
+//  PARTIDOS
+// ══════════════════════════════════════════════
 async function cargarPartidos() {
   const { data } = await sb.from('partidos').select('*').order('nombre')
-  partidosCache = data || []
+  partidosCache = data||[]
   renderListaPartidos()
   poblarSelectPartidos()
 }
@@ -330,28 +517,37 @@ function renderListaPartidos() {
   const cont = document.getElementById('lista-partidos-admin')
   if (!cont) return
   if (!partidosCache.length) {
-    cont.innerHTML = '<p style="color:var(--gris);font-size:.88rem">No hay partidos. Agrega el primero arriba.</p>'
-    return
+    cont.innerHTML='<p style="color:var(--gris);font-size:.88rem">No hay partidos aún.</p>'; return
   }
-  cont.innerHTML = partidosCache.map(p => `
-    <div class="item-row">
-      <div class="item-color" style="background:${p.color}"></div>
-      <div class="item-nombre">${p.nombre}</div>
-      <div class="item-detalle">${p.sigla} · ${(p.propuestas||[]).length} propuestas</div>
-      <div class="item-acciones">
-        <button class="btn-danger" onclick="eliminarPartido('${p.id}')">Eliminar</button>
-      </div>
-    </div>`).join('')
+  cont.innerHTML = partidosCache.map(p => {
+    const imgHtml = p.logo_url
+      ? `<img src="${p.logo_url}" class="item-img partido" alt="${p.nombre}" />`
+      : `<div class="item-img-placeholder partido" style="background:${p.color}">${p.sigla}</div>`
+    return `
+      <div class="item-row">
+        ${imgHtml}
+        <div class="item-nombre">${p.nombre}</div>
+        <div class="item-detalle">${p.sigla} · ${(p.propuestas||[]).length} propuestas</div>
+        <div class="item-acciones">
+          <button class="btn-edit" onclick="abrirEditarPartido('${p.id}')">Editar</button>
+          <button class="btn-danger" onclick="eliminarPartido('${p.id}')">Eliminar</button>
+        </div>
+      </div>`
+  }).join('')
 }
 
 function poblarSelectPartidos() {
-  const sel = document.getElementById('c-partido')
-  if (!sel) return
-  sel.innerHTML = '<option value="">Seleccionar partido...</option>'
-  partidosCache.forEach(p => {
-    const o = document.createElement('option')
-    o.value = p.id; o.textContent = p.nombre
-    sel.appendChild(o)
+  ;['c-partido','edit-c-partido'].forEach(selId => {
+    const sel = document.getElementById(selId)
+    if (!sel) return
+    const val = sel.value
+    sel.innerHTML = '<option value="">Seleccionar partido...</option>'
+    partidosCache.forEach(p => {
+      const o = document.createElement('option')
+      o.value=p.id; o.textContent=p.nombre
+      sel.appendChild(o)
+    })
+    if (val) sel.value = val
   })
 }
 
@@ -361,24 +557,74 @@ window.agregarPartido = async function() {
   const sigla     = document.getElementById('p-sigla').value.trim().toUpperCase()
   const color     = document.getElementById('p-color-text').value.trim()
   const propTxt   = document.getElementById('p-propuestas').value.trim()
-  const propuestas= propTxt ? propTxt.split('\n').map(s=>s.trim()).filter(Boolean) : []
+  const propuestas= propTxt?propTxt.split('\n').map(s=>s.trim()).filter(Boolean):[]
+  const logoFile  = document.getElementById('p-logo').files[0]
   const alerta    = document.getElementById('alerta-partido')
 
-  if (!id||!nombre||!sigla||!color) { mostrarAlerta(alerta,'Completa todos los campos obligatorios.',true); return }
+  if (!id||!nombre||!sigla||!color) { mostrarAlerta(alerta,'Completa los campos obligatorios.',true); return }
 
   const btn = document.querySelector('#panel-partidos .btn-primary')
   btn.disabled=true; btn.textContent='Guardando...'
 
-  const { error } = await sb.from('partidos').insert({id,nombre,sigla,color,propuestas})
+  const logo_url = logoFile
+    ? await subirImagen(logoFile,'logos','progress-partido','progress-partido-fill')
+    : null
+
+  const { error } = await sb.from('partidos').insert({id,nombre,sigla,color,propuestas,logo_url})
   btn.disabled=false; btn.textContent='+ Guardar partido'
 
-  if (error) {
-    mostrarAlerta(alerta, error.code==='23505' ? 'Ya existe un partido con ese ID.' : 'Error: '+error.message, true)
-    return
-  }
-  mostrarAlerta(alerta, `✓ Partido "${nombre}" guardado.`)
+  if (error) { mostrarAlerta(alerta,error.code==='23505'?'ID ya existe. Usa otro.':'Error: '+error.message,true); return }
+  mostrarAlerta(alerta,`✓ Partido "${nombre}" guardado.`)
   limpiarFormPartido()
   await cargarPartidos(); await cargarStats()
+}
+
+window.abrirEditarPartido = function(id) {
+  const p = partidosCache.find(x=>x.id===id)
+  if (!p) return
+  document.getElementById('edit-p-id-original').value = p.id
+  document.getElementById('edit-p-nombre').value      = p.nombre
+  document.getElementById('edit-p-sigla').value       = p.sigla
+  document.getElementById('edit-p-color-text').value  = p.color
+  document.getElementById('edit-p-color-picker').value= p.color
+  document.getElementById('edit-p-propuestas').value  = (p.propuestas||[]).join('\n')
+  const prev = document.getElementById('edit-preview-logo')
+  if (p.logo_url) { prev.src=p.logo_url; prev.style.display='block' }
+  else prev.style.display='none'
+  document.getElementById('edit-p-logo').value=''
+  document.getElementById('modal-partido').classList.add('abierto')
+}
+
+window.guardarEdicionPartido = async function() {
+  const id        = document.getElementById('edit-p-id-original').value
+  const nombre    = document.getElementById('edit-p-nombre').value.trim()
+  const sigla     = document.getElementById('edit-p-sigla').value.trim().toUpperCase()
+  const color     = document.getElementById('edit-p-color-text').value.trim()
+  const propTxt   = document.getElementById('edit-p-propuestas').value.trim()
+  const propuestas= propTxt?propTxt.split('\n').map(s=>s.trim()).filter(Boolean):[]
+  const logoFile  = document.getElementById('edit-p-logo').files[0]
+  const alerta    = document.getElementById('alerta-edit-partido')
+
+  if (!nombre||!sigla||!color) { mostrarAlerta(alerta,'Completa todos los campos.',true); return }
+
+  const btn = document.querySelector('#modal-partido .btn-guardar')
+  btn.disabled=true; btn.textContent='Guardando...'
+
+  let logo_url = undefined
+  if (logoFile) {
+    logo_url = await subirImagen(logoFile,'logos','progress-edit-partido','progress-edit-partido-fill')
+  }
+
+  const updates = {nombre,sigla,color,propuestas}
+  if (logo_url) updates.logo_url = logo_url
+
+  const { error } = await sb.from('partidos').update(updates).eq('id',id)
+  btn.disabled=false; btn.textContent='Guardar cambios'
+
+  if (error) { mostrarAlerta(alerta,'Error: '+error.message,true); return }
+  mostrarAlerta(alerta,'✓ Cambios guardados.')
+  setTimeout(()=>cerrarModal('modal-partido'),1200)
+  await cargarPartidos()
 }
 
 window.eliminarPartido = async function(id) {
@@ -388,32 +634,44 @@ window.eliminarPartido = async function(id) {
 }
 
 function limpiarFormPartido() {
-  ['p-id','p-nombre','p-sigla','p-propuestas'].forEach(i=>document.getElementById(i).value='')
+  ;['p-id','p-nombre','p-sigla','p-propuestas'].forEach(i=>document.getElementById(i).value='')
   document.getElementById('p-color-text').value='#C8102E'
   document.getElementById('p-color-picker').value='#C8102E'
+  document.getElementById('p-logo').value=''
+  const prev=document.getElementById('preview-logo')
+  prev.src=''; prev.style.display='none'
+  const txt=document.querySelector('#upload-area-partido .upload-text')
+  if (txt) txt.style.display='block'
 }
 
-// ── CANDIDATOS ──
+// ══════════════════════════════════════════════
+//  CANDIDATOS
+// ══════════════════════════════════════════════
 async function cargarCandidatos() {
   const { data } = await sb.from('candidatos').select('*').order('nombre')
-  renderListaCandidatos(data||[])
+  candidatosCache = data||[]
+  renderListaCandidatos()
 }
 
-function renderListaCandidatos(lista) {
+function renderListaCandidatos() {
   const cont = document.getElementById('lista-candidatos-admin')
   if (!cont) return
-  if (!lista.length) {
-    cont.innerHTML = '<p style="color:var(--gris);font-size:.88rem">No hay candidatos. Agrega el primero arriba.</p>'
-    return
+  if (!candidatosCache.length) {
+    cont.innerHTML='<p style="color:var(--gris);font-size:.88rem">No hay candidatos aún.</p>'; return
   }
-  cont.innerHTML = lista.map(c => {
+  cont.innerHTML = candidatosCache.map(c => {
     const p = partidosCache.find(x=>x.id===c.partido_id)||{}
+    const iniciales = c.nombre.split(' ').slice(0,2).map(n=>n[0]).join('')
+    const imgHtml = c.foto_url
+      ? `<img src="${c.foto_url}" class="item-img" alt="${c.nombre}" />`
+      : `<div class="item-img-placeholder" style="background:${p.color||'#999'}">${iniciales}</div>`
     return `
       <div class="item-row">
-        <div class="item-color" style="background:${p.color||'#999'}"></div>
+        ${imgHtml}
         <div class="item-nombre">${c.nombre}</div>
         <div class="item-detalle">${p.nombre||c.partido_id} · ${c.edad} años · ${c.denuncias} denuncias · ${c.votos||0} votos</div>
         <div class="item-acciones">
+          <button class="btn-edit" onclick="abrirEditarCandidato(${c.id})">Editar</button>
           <button class="btn-danger" onclick="eliminarCandidato(${c.id})">Eliminar</button>
         </div>
       </div>`
@@ -421,15 +679,16 @@ function renderListaCandidatos(lista) {
 }
 
 window.agregarCandidato = async function() {
-  const nombre     = document.getElementById('c-nombre').value.trim()
-  const partido_id = document.getElementById('c-partido').value
-  const edad       = parseInt(document.getElementById('c-edad').value)
-  const nacimiento = document.getElementById('c-nacimiento').value.trim()
-  const denuncias  = parseInt(document.getElementById('c-denuncias').value)||0
-  const experiencia= document.getElementById('c-experiencia').value.trim()
-  const cargosTxt  = document.getElementById('c-cargos').value.trim()
-  const cargos     = cargosTxt ? cargosTxt.split('\n').map(s=>s.trim()).filter(Boolean) : []
-  const alerta     = document.getElementById('alerta-candidato')
+  const nombre      = document.getElementById('c-nombre').value.trim()
+  const partido_id  = document.getElementById('c-partido').value
+  const edad        = parseInt(document.getElementById('c-edad').value)
+  const nacimiento  = document.getElementById('c-nacimiento').value.trim()
+  const denuncias   = parseInt(document.getElementById('c-denuncias').value)||0
+  const experiencia = document.getElementById('c-experiencia').value.trim()
+  const cargosTxt   = document.getElementById('c-cargos').value.trim()
+  const cargos      = cargosTxt?cargosTxt.split('\n').map(s=>s.trim()).filter(Boolean):[]
+  const fotoFile    = document.getElementById('c-foto').files[0]
+  const alerta      = document.getElementById('alerta-candidato')
 
   if (!nombre||!partido_id||!edad||!nacimiento) {
     mostrarAlerta(alerta,'Completa: nombre, partido, edad y nacimiento.',true); return
@@ -438,59 +697,131 @@ window.agregarCandidato = async function() {
   const btn = document.querySelector('#panel-candidatos .btn-primary')
   btn.disabled=true; btn.textContent='Guardando...'
 
-  const { error } = await sb.from('candidatos').insert({nombre,partido_id,edad,nacimiento,denuncias,experiencia,cargos,votos:0})
+  const foto_url = fotoFile
+    ? await subirImagen(fotoFile,'fotos','progress-candidato','progress-candidato-fill')
+    : null
+
+  const { error } = await sb.from('candidatos').insert({nombre,partido_id,edad,nacimiento,denuncias,experiencia,cargos,votos:0,foto_url})
   btn.disabled=false; btn.textContent='+ Guardar candidato'
 
   if (error) { mostrarAlerta(alerta,'Error: '+error.message,true); return }
-  mostrarAlerta(alerta, `✓ Candidato "${nombre}" guardado.`)
+  mostrarAlerta(alerta,`✓ Candidato "${nombre}" guardado.`)
   limpiarFormCandidato()
   await cargarCandidatos(); await cargarStats()
 }
 
+window.abrirEditarCandidato = function(id) {
+  const c = candidatosCache.find(x=>x.id===id)
+  if (!c) return
+  document.getElementById('edit-c-id').value          = c.id
+  document.getElementById('edit-c-nombre').value      = c.nombre
+  document.getElementById('edit-c-edad').value        = c.edad
+  document.getElementById('edit-c-nacimiento').value  = c.nacimiento
+  document.getElementById('edit-c-denuncias').value   = c.denuncias
+  document.getElementById('edit-c-experiencia').value = c.experiencia||''
+  document.getElementById('edit-c-cargos').value      = (c.cargos||[]).join('\n')
+  poblarSelectPartidos()
+  document.getElementById('edit-c-partido').value     = c.partido_id
+  const prev = document.getElementById('edit-preview-foto')
+  if (c.foto_url) { prev.src=c.foto_url; prev.style.display='block' }
+  else prev.style.display='none'
+  document.getElementById('edit-c-foto').value=''
+  document.getElementById('modal-candidato').classList.add('abierto')
+}
+
+window.guardarEdicionCandidato = async function() {
+  const id         = parseInt(document.getElementById('edit-c-id').value)
+  const nombre     = document.getElementById('edit-c-nombre').value.trim()
+  const partido_id = document.getElementById('edit-c-partido').value
+  const edad       = parseInt(document.getElementById('edit-c-edad').value)
+  const nacimiento = document.getElementById('edit-c-nacimiento').value.trim()
+  const denuncias  = parseInt(document.getElementById('edit-c-denuncias').value)||0
+  const experiencia= document.getElementById('edit-c-experiencia').value.trim()
+  const cargosTxt  = document.getElementById('edit-c-cargos').value.trim()
+  const cargos     = cargosTxt?cargosTxt.split('\n').map(s=>s.trim()).filter(Boolean):[]
+  const fotoFile   = document.getElementById('edit-c-foto').files[0]
+  const alerta     = document.getElementById('alerta-edit-candidato')
+
+  if (!nombre||!partido_id||!edad||!nacimiento) {
+    mostrarAlerta(alerta,'Completa los campos obligatorios.',true); return
+  }
+
+  const btn = document.querySelector('#modal-candidato .btn-guardar')
+  btn.disabled=true; btn.textContent='Guardando...'
+
+  let foto_url = undefined
+  if (fotoFile) {
+    foto_url = await subirImagen(fotoFile,'fotos','progress-edit-candidato','progress-edit-candidato-fill')
+  }
+
+  const updates = {nombre,partido_id,edad,nacimiento,denuncias,experiencia,cargos}
+  if (foto_url) updates.foto_url = foto_url
+
+  const { error } = await sb.from('candidatos').update(updates).eq('id',id)
+  btn.disabled=false; btn.textContent='Guardar cambios'
+
+  if (error) { mostrarAlerta(alerta,'Error: '+error.message,true); return }
+  mostrarAlerta(alerta,'✓ Cambios guardados.')
+  setTimeout(()=>cerrarModal('modal-candidato'),1200)
+  await cargarCandidatos()
+}
+
 window.eliminarCandidato = async function(id) {
-  if (!confirm('¿Eliminar este candidato? Sus votos también se perderán.')) return
+  if (!confirm('¿Eliminar este candidato? Sus votos también se eliminarán.')) return
   await sb.from('candidatos').delete().eq('id',id)
   await cargarCandidatos(); await cargarStats()
 }
 
 function limpiarFormCandidato() {
-  ['c-nombre','c-edad','c-nacimiento','c-experiencia','c-cargos'].forEach(i=>document.getElementById(i).value='')
+  ;['c-nombre','c-edad','c-nacimiento','c-experiencia','c-cargos'].forEach(i=>document.getElementById(i).value='')
   document.getElementById('c-denuncias').value='0'
   document.getElementById('c-partido').value=''
+  document.getElementById('c-foto').value=''
+  const prev=document.getElementById('preview-foto')
+  prev.src=''; prev.style.display='none'
+  const txt=document.querySelector('#upload-area-candidato .upload-text')
+  if (txt) txt.style.display='block'
 }
 
-// ── RESULTADOS ──
+// ══════════════════════════════════════════════
+//  RESULTADOS
+// ══════════════════════════════════════════════
 window.cargarResultados = async function() {
-  const { data } = await sb.from('candidatos').select('nombre,votos,partido_id').order('votos',{ascending:false})
+  const { data } = await sb.from('candidatos').select('nombre,votos,partido_id,foto_url').order('votos',{ascending:false})
   const cont = document.getElementById('resultados-admin')
   if (!data||!data.length) { cont.innerHTML='<p style="color:var(--gris);font-size:.88rem">Aún no hay votos.</p>'; return }
   const total = data.reduce((a,c)=>a+(c.votos||0),0)
   cont.innerHTML = data.map(c => {
     const p = partidosCache.find(x=>x.id===c.partido_id)||{}
-    const pct = total>0 ? Math.round(((c.votos||0)/total)*100) : 0
+    const pct = total>0?Math.round(((c.votos||0)/total)*100):0
     return `
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.88rem">
-          <span><strong>${c.nombre}</strong> <span style="color:var(--gris)">${p.nombre||''}</span></span>
-          <span style="font-family:var(--font-display);font-weight:700">${pct}% · ${(c.votos||0).toLocaleString()} votos</span>
-        </div>
-        <div style="background:#E8E4DC;border-radius:4px;height:8px;overflow:hidden">
-          <div style="width:${pct}%;height:100%;background:${p.color||'var(--rojo)'};border-radius:4px"></div>
+      <div style="margin-bottom:14px;display:flex;align-items:center;gap:12px">
+        ${c.foto_url?`<img src="${c.foto_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0" />`:''}
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.88rem">
+            <span><strong>${c.nombre}</strong> <span style="color:var(--gris)">${p.nombre||''}</span></span>
+            <span style="font-family:var(--font-display);font-weight:700">${pct}% · ${(c.votos||0).toLocaleString()}</span>
+          </div>
+          <div style="background:#E8E4DC;border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${p.color||'var(--rojo)'};border-radius:4px"></div>
+          </div>
         </div>
       </div>`
-  }).join('') + `<p style="font-size:.82rem;color:var(--gris);margin-top:1rem">Total: ${total.toLocaleString()} votos</p>`
+  }).join('')+`<p style="font-size:.82rem;color:var(--gris);margin-top:1rem">Total: ${total.toLocaleString()} votos</p>`
 }
 
 window.confirmarResetVotos = async function() {
-  if (prompt('Escribe CONFIRMAR para reiniciar todos los votos:') !== 'CONFIRMAR') return
+  if (prompt('Escribe CONFIRMAR para reiniciar todos los votos:')!=='CONFIRMAR') return
   await sb.from('candidatos').update({votos:0}).neq('id',0)
   await sb.from('votos').delete().neq('id',0)
-  alert('✓ Votos reiniciados correctamente.')
+  alert('✓ Votos reiniciados.')
   await cargarTodo()
 }
 
-// ── HELPERS ──
-window.cambiarPanel = function(id, btn) {
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+window.cambiarPanel = function(id,btn) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('activo'))
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('activo'))
   document.getElementById('panel-'+id).classList.add('activo')
@@ -498,11 +829,19 @@ window.cambiarPanel = function(id, btn) {
   if (id==='resultados') cargarResultados()
 }
 
-function mostrarAlerta(el, msg, esError=false) {
+window.cerrarModal = function(id) {
+  document.getElementById(id).classList.remove('abierto')
+}
+
+window.cerrarModalSiFuera = function(e,id) {
+  if (e.target===document.getElementById(id)) cerrarModal(id)
+}
+
+function mostrarAlerta(el,msg,esError=false) {
   el.textContent=msg
   el.className='alerta '+(esError?'error':'ok')
   el.style.display='block'
-  setTimeout(()=>el.style.display='none', 4000)
+  setTimeout(()=>el.style.display='none',4000)
 }
 </script>
 </body>
