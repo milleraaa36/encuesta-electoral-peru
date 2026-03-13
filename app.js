@@ -25,7 +25,15 @@ let yaVoto = false
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // 1. Escuchar cambios de sesión (login / logout automático)
+  // 1. Cargar datos iniciales
+  mostrarCargando(true)
+  await cargarDatos()
+  mostrarCargando(false)
+
+  // 2. Render inicial de encuesta
+  await renderEncuesta()
+
+  // 3. Escuchar cambios de sesión (login / logout automático)
   escucharSesion(async (usuario) => {
     usuarioActual = usuario
     actualizarHeaderUsuario()
@@ -38,16 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('aviso-login').style.display = 'block'
     }
 
-    renderEncuesta()
+    await renderEncuesta()
   })
-
-  // 2. Cargar datos desde Supabase
-  mostrarCargando(true)
-  await cargarDatos()
-  mostrarCargando(false)
-
-  // 3. Render inicial
-  renderEncuesta()
 })
 
 // ══════════════════════════════════════════════
@@ -76,11 +76,14 @@ function mostrarCargando(estado) {
 // ══════════════════════════════════════════════
 //  NAVEGACIÓN
 // ══════════════════════════════════════════════
-window.mostrarSeccion = function(id, btn) {
+window.mostrarSeccion = async function(id, btn) {
   document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'))
   document.getElementById(id).classList.add('activa')
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'))
   if (btn) btn.classList.add('activo')
+
+  // Recarga datos frescos en cada sección
+  await cargarDatos()
 
   if (id === 'inicio')     renderEncuesta()
   if (id === 'partidos')   renderPartidos()
@@ -110,20 +113,35 @@ function actualizarHeaderUsuario() {
 // ══════════════════════════════════════════════
 //  RENDER: ENCUESTA
 // ══════════════════════════════════════════════
-function renderEncuesta() {
-  const totalVotos = CANDIDATOS.reduce((acc, c) => acc + (c.votos || 0), 0)
+async function renderEncuesta() {
   const contenedor = document.getElementById('lista-candidatos')
-  if (!contenedor || CANDIDATOS.length === 0) return
+  if (!contenedor) return
+
+  // Siempre recarga los datos frescos desde Supabase
+  await cargarDatos()
+
+  if (CANDIDATOS.length === 0) {
+    contenedor.innerHTML = `<p style="text-align:center;color:var(--gris);padding:1.5rem;font-size:.9rem">
+      La encuesta se activará cuando el administrador agregue los candidatos.</p>`
+    document.getElementById('total-votos').textContent = '0 votos registrados'
+    return
+  }
+
+  const totalVotos = CANDIDATOS.reduce((acc, c) => acc + (c.votos || 0), 0)
 
   contenedor.innerHTML = CANDIDATOS.map(c => {
     const partido = PARTIDOS.find(p => p.id === c.partido_id) || {}
     const pct = totalVotos > 0 ? Math.round(((c.votos || 0) / totalVotos) * 100) : 0
+    const cursor = yaVoto || !usuarioActual ? 'default' : 'pointer'
+
+    // Foto o círculo de color
+    const fotoHtml = c.foto_url
+      ? `<img src="${c.foto_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid var(--borde)" alt="${c.nombre}" />`
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${partido.color||'#999'};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:.75rem;color:white">${c.nombre.split(' ').slice(0,2).map(n=>n[0]).join('')}</div>`
 
     return `
-      <div class="candidato-opcion"
-           onclick="votar(${c.id})"
-           style="cursor:${yaVoto || !usuarioActual ? 'default' : 'pointer'}">
-        <div class="partido-color" style="background:${partido.color || '#999'}"></div>
+      <div class="candidato-opcion" onclick="votar(${c.id})" style="cursor:${cursor}">
+        ${fotoHtml}
         <div style="flex:1;min-width:0">
           <div class="candidato-nombre">${c.nombre}</div>
           <div class="candidato-partido">${partido.nombre || ''}</div>
@@ -188,23 +206,31 @@ function renderPartidos() {
     return
   }
 
-  contenedor.innerHTML = PARTIDOS.map(p => `
-    <div class="tarjeta">
-      <div class="partido-header">
-        ${p.logo_url
-          ? `<img src="${p.logo_url}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0" alt="${p.nombre}" />`
-          : `<div class="partido-logo" style="background:${p.color}">${p.sigla}</div>`
-        }
-        <div>
-          <div class="partido-nombre">${p.nombre}</div>
-          <div class="partido-sigla">Partido político</div>
+  contenedor.innerHTML = PARTIDOS.map(p => {
+    // Logo: imagen si existe, sino bloque de color con sigla
+    let logoHtml
+    if (p.logo_url) {
+      logoHtml = `<img src="${p.logo_url}"
+        style="width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--borde)"
+        alt="${p.nombre}" />`
+    } else {
+      logoHtml = `<div class="partido-logo" style="background:${p.color}">${p.sigla}</div>`
+    }
+
+    return `
+      <div class="tarjeta">
+        <div class="partido-header">
+          ${logoHtml}
+          <div>
+            <div class="partido-nombre">${p.nombre}</div>
+            <div class="partido-sigla">${p.sigla} · Partido político</div>
+          </div>
         </div>
-      </div>
-      <ul class="propuestas-lista">
-        ${(p.propuestas || []).map(prop => `<li>${prop}</li>`).join('')}
-      </ul>
-    </div>`
-  ).join('')
+        <ul class="propuestas-lista">
+          ${(p.propuestas || []).map(prop => `<li>${prop}</li>`).join('')}
+        </ul>
+      </div>`
+  }).join('')
 }
 
 // ══════════════════════════════════════════════
